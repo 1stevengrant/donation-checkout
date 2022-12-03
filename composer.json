@@ -1,0 +1,58 @@
+{
+    "name": "ghijk/donation-checkout",
+    "license": "proprietary",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Steven Grant",
+            "email": "steven@ghijk.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "keywords": [
+        "ghijk",
+        "donation-checkout",
+        "statamic",
+        "stripe checkout"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Ghijk\\DonationCheckout\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Donation Checkout",
+            "description": "Statamic addon for accepting variable single and recurring donations via Stripe Checkout.",
+            "editions": ["pro"]
+        },
+        "laravel": {
+            "providers": [
+                "Ghijk\\DonationCheckout\\ServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "stripe/stripe-php": "^10.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.2",
+        "pestphp/pest": "^1.22",
+        "spatie/ray": "^1.36"
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
