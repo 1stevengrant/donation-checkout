@@ -9,8 +9,6 @@ class UserService
 {
     public function findByEmail(string $email)
     {
-        ray('find by email '.$email);
-
         return User::findByEmail($email);
     }
 
@@ -19,7 +17,6 @@ class UserService
         string $lastName,
         string $email
     ) {
-        ray('create user '.$email);
         $user = User::make()->email($email);
         $user->password(Str::random(16))
             ->data([
@@ -27,17 +24,14 @@ class UserService
                 'last_name' => $lastName,
             ]);
         $user->save();
-        ray($user);
 
         return $user;
     }
 
     public function updateUser($user, $data)
     {
-        ray('update user '.$user->email());
         $user->data($data);
         $user->save();
-        ray($user);
 
         return $user;
     }
