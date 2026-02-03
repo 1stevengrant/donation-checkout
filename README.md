@@ -3,7 +3,7 @@
 Uses Stripe Checkout to handle variable recurring and single donations in Statamic
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ghijk/donation-checkout.svg?style=flat-square)](https://packagist.org/packages/ghijk/donation-checkout)
-[![Tests](https://github.com/ghijk/donation-checkout/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/ghijk/donation-checkout/actions/workflows/run-tests.yml)
+[![Tests](https://github.com/1stevengrant/donation-checkout/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/1stevengrant/donation-checkout/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/ghijk/donation-checkout.svg?style=flat-square)](https://packagist.org/packages/ghijk/donation-checkout)
 
 This addon allows you to use Stripe Checkout to handle variable recurring and single donations in a Statamic site.
