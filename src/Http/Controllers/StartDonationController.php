@@ -5,6 +5,7 @@ namespace Ghijk\DonationCheckout\Http\Controllers;
 use Ghijk\DonationCheckout\Http\Requests\DonationRequest;
 use Ghijk\DonationCheckout\Services\PaymentService;
 use Ghijk\DonationCheckout\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Statamic\Http\Controllers\Controller;
 
 class StartDonationController extends Controller
@@ -13,14 +14,10 @@ class StartDonationController extends Controller
         DonationRequest $donationRequest,
         PaymentService $paymentService,
         UserService $userService
-    ) {
+    ): JsonResponse {
         $validated = $donationRequest->validated();
 
-        ray('request validated');
-
         $user = $userService->findByEmail($validated['email']);
-
-        ray($user);
 
         if (! $user) {
             $user = $userService->createUser(
@@ -42,18 +39,31 @@ class StartDonationController extends Controller
             );
         }
 
+        $session = null;
+
         if ($validated['frequency'] === 'single') {
-            return $paymentService->singleDonation(
+            $session = $paymentService->singleDonation(
                 user: $user,
                 amount: $validated['amount']
             );
         }
 
         if ($validated['frequency'] === 'recurring') {
-            return $paymentService->recurringDonation(
+            $session = $paymentService->recurringDonation(
                 user: $user,
                 amount: $validated['amount']
             );
         }
+
+        if (! $session) {
+            return response()->json([
+                'message' => 'Invalid frequency specified.',
+                'frequency_received' => $validated['frequency'],
+            ], 422);
+        }
+
+        return response()->json([
+            'url' => $session->url,
+        ]);
     }
 }

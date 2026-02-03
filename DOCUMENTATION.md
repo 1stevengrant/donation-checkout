@@ -28,154 +28,365 @@ Installing Donation Checkout will add a `donation-checkout.php` folder to your `
 
 ### Frontend Implementation
 
-A donation requires a few parametersto be passed to Stripe:
+There are two ways to implement the donation form in your Statamic site:
+
+1. **Using Statamic Tags** (Recommended) - Quick setup with customisable views
+2. **Custom Implementation** - Full control using the API endpoint directly
+
+Both methods require the following parameters to be passed to Stripe:
 - amount
 - first name
 - last name
 - email address
 - frequency (single or recurring)
 
-### Expected outcomes
+---
+
+## Option 1: Using Statamic Tags
+
+The addon provides Antlers tags for quick implementation using vanilla JavaScript (no framework dependencies).
+
+### Basic Usage
+
+Add the CSRF meta tag to your layout's `<head>`:
+
+```antlers
+<meta name="csrf-token" content="{{ csrf_token }}">
+```
+
+Add the form to your template:
+
+```antlers
+{{ donation:form }}
+```
+
+Add the JavaScript before your closing `</body>` tag:
+
+```antlers
+{{ donation:scripts }}
+```
+
+### Customising the Form
+
+The `donation:form` tag accepts several parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `amounts` | `5\|10\|50` | Pipe-separated preset amounts |
+| `default` | `10` | Default selected amount |
+| `frequency` | `recurring` | Default frequency (`single` or `recurring`) |
+| `currency_symbol` | `£` | Currency symbol to display |
+| `button_text` | `Donate` | Submit button text |
+
+Example with custom options:
+
+```antlers
+{{ donation:form amounts="10|25|50|100" default="25" frequency="single" currency_symbol="$" button_text="Give Now" }}
+```
+
+### Publishing Views for Customisation
+
+To fully customise the form markup, publish the views to your project:
+
+```bash
+php artisan vendor:publish --tag=donation-checkout-views
+```
+
+This will copy the views to `resources/views/vendor/donation-checkout/`:
+
+- `form.blade.php` - The donation form markup
+- `scripts.blade.php` - The vanilla JavaScript component
+
+You can then edit these files to match your site's design. The form uses CSS classes prefixed with `donation-` for easy styling:
+
+- `.donation-form` - Form container
+- `.donation-frequency` - Frequency button group
+- `.donation-frequency-btn` - Frequency buttons (has `.active` state)
+- `.donation-amounts` - Amount button container
+- `.donation-amount-btn` - Amount buttons (has `.active` state)
+- `.donation-custom-amount` - Custom amount input wrapper
+- `.donation-fields` - Name fields container
+- `.donation-field` - Individual field wrapper
+- `.donation-submit` - Submit button container
+- `.donation-submit-btn` - Submit button
+- `.donation-error` - Error message display
+
+### Additional Tags
+
+| Tag | Description |
+|-----|-------------|
+| `{{ donation:stripe_key }}` | Outputs your Stripe publishable key |
+| `{{ donation:endpoint }}` | Outputs the API endpoint URL |
+| `{{ donation:currency }}` | Outputs the configured currency code |
+
+---
+
+## Option 2: Custom Implementation
+
+For full control, you can build your own form and interact with the API endpoint directly.
+
+### Expected Outcomes
 
 Passing the correct parameters to the `/donation-checkout/start` endpoint will check for a Statamic user with the
 submitted email address. If one doesn't exist, it will create one. It will then check for Stripe Customer ID against that user. If one doesn't exist, it will create one.
 
 From there it will create the appropriate Stripe Checkout session and return the session ID to the frontend.
 
-Here's an example of a form that makes use of Alpine.js to handle the donation process:
+### Plain JavaScript Example
+
+Here's a framework-agnostic implementation using vanilla JavaScript:
 
 ```html
-<!-- donation form start -->
-<div x-data="donateForm">
-  <form class="bg-white shadow m-4 p-4 space-y-4 max-w-[600px]"
-        @submit.prevent="makeDonation()"
-        method="post">
-
-    <div>
-      <button class="px-4 py-2 border-2 border border-gray-300"
-      type="button"
-      :class="{'font-semibold bg-blue-500 text-white border-blue-500 hover:border-blue-500': data.frequency ===
-      'recurring' }"
-      @click="data.frequency = 'recurring'">
-        Monthly
-        </button>
-       <button class="px-4 py-2 border-2 border border-gray-300"
-       type="button"
-       :class="{ 'font-semibold bg-blue-500 text-white border-blue-500 hover:border-blue-500': data.frequency ===
-       'single' }"
-       @click="data.frequency = 'single'">
-       One-off
-       </button>
-    </div>
-
-    <p class="font-semibold">Choose a donation amount</p>
-
-    <div class="flex items-start mt-4">
-        <template x-for="a in data.amounts">
-            <button x-text="`£ ${a}`"
-                type="button"
-                :class="{ 'bg-blue-500 text-white border-blue-500 hover:border-blue-500': data.amount === a }"
-                @click="data.amount = a"
-                class="font-semibold mr-4 last:mr-0 w-[100px] h-[100px] p-4 border-2 border-gray-100 hover:border-gray-300"></button>
-        </template>
-    </div>
-    <label class="flex items-center space-x-4">
-        <span class="font-semibold">£</span>
-        <input type="number"
-                name="amount"
-                id="amount"
-                x-model="data.amount"
-                required
-                class="border p-2 w-full">
-    </label>
-    <div class="grid grid-cols-2 gap-4">
+<head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <form id="donation-form">
         <div>
-            <label for="first_name" class="text-sm font-semibold block">
-                First Name
-            </label>
-            <input type="text"
-                name="first_name"
-                id="first_name"
-                required
-                class="border p-2 w-full"
-                x-model="data.first_name"
-                placeholder="John">
+            <button type="button" class="frequency-btn active" data-frequency="recurring">Monthly</button>
+            <button type="button" class="frequency-btn" data-frequency="single">One-off</button>
         </div>
-        <div>
-          <label for="last_name" class="text-sm font-semibold block">
-                Last Name
-            </label>
-          <input type="text"
-                name="last_name"
-                id="last_name"
-                x-model="data.last_name"
-                required
-                class="border p-2 w-full"
-                placeholder="Doe">
+
+        <p>Choose a donation amount</p>
+
+        <div id="amount-buttons">
+            <button type="button" class="amount-btn" data-amount="5">£5</button>
+            <button type="button" class="amount-btn active" data-amount="10">£10</button>
+            <button type="button" class="amount-btn" data-amount="50">£50</button>
         </div>
-    </div>
-    <div>
-      <label for="email" class="text-sm font-semibold block">
-            Email
+
+        <label>
+            <span>£</span>
+            <input type="number" name="amount" id="amount" value="10" min="1" required>
         </label>
-      <input type="email"
-            name="email"
-            id="email"
-            class="border p-2 w-full"
-            x-model="data.email"
-            required
-            placeholder="johndoe@gmail.com">
-    </div>
-    <div>
-      <button class="font-semibold bg-blue-500 hover:bg-blue-400 transition ease-in-out p-4 text-white">
-        Donate
-      </button>
-    </div>
-  </form>
-</div>
-<!-- /donation form -->
+
+        <div>
+            <label for="first_name">First Name</label>
+            <input type="text" name="first_name" id="first_name" required>
+        </div>
+
+        <div>
+            <label for="last_name">Last Name</label>
+            <input type="text" name="last_name" id="last_name" required>
+        </div>
+
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+
+        <button type="submit" id="submit-btn">Donate</button>
+        <p id="error-message" style="display: none; color: red;"></p>
+    </form>
+
+    <script>
+        (function() {
+            const form = document.getElementById('donation-form');
+            const amountInput = document.getElementById('amount');
+            const submitBtn = document.getElementById('submit-btn');
+            const errorMessage = document.getElementById('error-message');
+            let frequency = 'recurring';
+
+            // Frequency toggle
+            document.querySelectorAll('.frequency-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.frequency-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    frequency = this.dataset.frequency;
+                });
+            });
+
+            // Amount buttons
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    amountInput.value = this.dataset.amount;
+                });
+            });
+
+            // Update active state when typing custom amount
+            amountInput.addEventListener('input', function() {
+                document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing...';
+                errorMessage.style.display = 'none';
+
+                const data = {
+                    amount: parseInt(amountInput.value),
+                    frequency: frequency,
+                    first_name: document.getElementById('first_name').value,
+                    last_name: document.getElementById('last_name').value,
+                    email: document.getElementById('email').value
+                };
+
+                fetch('/donation-checkout/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.url) {
+                        window.location.href = data.url;
+                    }
+                })
+                .catch(error => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Donate';
+                    errorMessage.textContent = error.message || 'An error occurred. Please try again.';
+                    errorMessage.style.display = 'block';
+                });
+            });
+        })();
+    </script>
+</body>
 ```
 
-```js
-document.addEventListener('alpine:init', () => {
-    Alpine.data('donateForm', () => ({
-        data: {
-            amount: 10,
-            amounts: [5, 10, 50],
-            frequency: 'recurring',
-            first_name: '',
-            last_name: '',
-            email: '',
-        },
+### Alpine.js Example
 
-        makeDonation() {
-            fetch('/donation-checkout/start', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.data)
-            })
-                .then(r => r.json())
-                .then(data => window.location.href = data.url)
-                .catch(error => console.log(error))
-        }
-    }))
-})
-
-```
-Breaking it down, the form has a few things going on: it has a button group to toggle `frequency` between single and
-recurring. It has a button group to select the amount to donate, in addition to a number input that allows a manual override.
-
-It has a text input to allow the user to enter their first name, last name and email address. These are all marked
-as required fields and are validated in the `POST` request to `/donation-checkout/start`. If the request is
-successful, it returns a Stripe Checkout session response which is converted to JSON and the `url` is used to redirect to Stripe Checkout.
-
-If you want to use this implementation as is, be sure to have the script tags in the head of your layout template:
+If you prefer using Alpine.js for reactivity:
 
 ```html
-<script src="{{ mix src='/js/site.js' }}" defer></script>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <div x-data="donateForm">
+        <form @submit.prevent="makeDonation()" method="post">
+            <div>
+                <button type="button"
+                        :class="{ 'active': frequency === 'recurring' }"
+                        @click="frequency = 'recurring'">
+                    Monthly
+                </button>
+                <button type="button"
+                        :class="{ 'active': frequency === 'single' }"
+                        @click="frequency = 'single'">
+                    One-off
+                </button>
+            </div>
+
+            <p>Choose a donation amount</p>
+
+            <div>
+                <template x-for="a in amounts">
+                    <button type="button"
+                            x-text="`£${a}`"
+                            :class="{ 'active': amount === a }"
+                            @click="amount = a">
+                    </button>
+                </template>
+            </div>
+
+            <label>
+                <span>£</span>
+                <input type="number" name="amount" x-model="amount" min="1" required>
+            </label>
+
+            <div>
+                <label for="first_name">First Name</label>
+                <input type="text" name="first_name" x-model="first_name" required>
+            </div>
+
+            <div>
+                <label for="last_name">Last Name</label>
+                <input type="text" name="last_name" x-model="last_name" required>
+            </div>
+
+            <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" x-model="email" required>
+            </div>
+
+            <button type="submit" :disabled="loading">
+                <span x-show="!loading">Donate</span>
+                <span x-show="loading">Processing...</span>
+            </button>
+
+            <p x-show="error" x-text="error" style="color: red;"></p>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('donateForm', () => ({
+                amount: 10,
+                amounts: [5, 10, 50],
+                frequency: 'recurring',
+                first_name: '',
+                last_name: '',
+                email: '',
+                loading: false,
+                error: null,
+
+                makeDonation() {
+                    this.loading = true;
+                    this.error = null;
+
+                    fetch('/donation-checkout/start', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            amount: this.amount,
+                            frequency: this.frequency,
+                            first_name: this.first_name,
+                            last_name: this.last_name,
+                            email: this.email
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => Promise.reject(err));
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.url) {
+                            window.location.href = data.url;
+                        }
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        this.error = error.message || 'An error occurred. Please try again.';
+                    });
+                }
+            }));
+        });
+    </script>
+</body>
 ```
 
-Of course, you could handle this in plain JavaScript, Vue, React or any other framework you prefer.
+### How It Works
+
+Both examples handle:
+
+1. **Frequency toggle** - Switch between `recurring` (monthly) and `single` (one-off) donations
+2. **Preset amounts** - Quick selection buttons for common donation amounts
+3. **Custom amount** - Manual input for any donation amount
+4. **Form validation** - Required fields for first name, last name, and email
+5. **CSRF protection** - Token sent with the request to prevent cross-site attacks
+6. **Error handling** - Display errors if the request fails
+7. **Loading state** - Disable the button and show feedback while processing
+
+On successful submission, the endpoint returns a Stripe Checkout URL and the user is redirected to complete their payment.

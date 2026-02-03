@@ -14,4 +14,8 @@ return [
     'recurring_donation_success_message' => 'Thank you for your donation!',
     'recurring_donation_success_url' => '', // e.g url('thanks?session_id={CHECKOUT_SESSION_ID}'),
     'recurring_donation_cancel_url' => '', // e.g url('?cancel=true'),
+
+    // Form defaults (used by donation:scripts tag)
+    'default_amount' => 10,
+    'default_frequency' => 'recurring', // 'single' or 'recurring'
 ];
