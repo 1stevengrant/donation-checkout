@@ -16,7 +16,7 @@ class Donation extends Tags
         $amounts = $this->params->get('amounts', '5|10|50');
 
         if (is_string($amounts)) {
-            $amounts = array_map('intval', explode('|', $amounts));
+            $amounts = array_map(intval(...), explode('|', $amounts));
         }
 
         return view('donation-checkout::form', [

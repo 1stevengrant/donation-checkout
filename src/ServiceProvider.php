@@ -2,9 +2,10 @@
 
 namespace Ghijk\DonationCheckout;
 
+use Statamic\Statamic;
+use Stripe\StripeClient;
 use Ghijk\DonationCheckout\Tags\Donation;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -15,19 +16,38 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $routes = [
-        'web' => __DIR__.'/../routes/web.php',
+        'web' => __DIR__ . '/../routes/web.php',
     ];
 
-    public function bootAddon()
+    #[\Override]
+    public function register(): void
     {
-        Statamic::afterInstalled(function ($command) {
+        parent::register();
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/donation-checkout.php', 'donation-checkout'
+        );
+
+        $this->app->singleton(StripeClient::class, fn (): StripeClient => new StripeClient(
+            config('donation-checkout.stripe_secret_key')
+        ));
+    }
+
+    #[\Override]
+    public function bootAddon(): void
+    {
+        Statamic::afterInstalled(function ($command): void {
             $command->call('vendor:publish', ['--tag' => 'donation-checkout-config']);
         });
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'donation-checkout');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'donation-checkout');
 
         $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/donation-checkout'),
+            __DIR__ . '/../config/donation-checkout.php' => config_path('donation-checkout.php'),
+        ], 'donation-checkout-config');
+
+        $this->publishes([
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/donation-checkout'),
         ], 'donation-checkout-views');
     }
 }
