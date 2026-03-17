@@ -2,17 +2,21 @@
 
 namespace Ghijk\DonationCheckout\Http\Controllers;
 
-use Ghijk\DonationCheckout\Http\Requests\DonationRequest;
-use Ghijk\DonationCheckout\Services\PaymentService;
-use Ghijk\DonationCheckout\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Statamic\Http\Controllers\Controller;
+use Ghijk\DonationCheckout\Services\UserService;
+use Ghijk\DonationCheckout\Actions\CreateSingleDonation;
+use Ghijk\DonationCheckout\Actions\CreateStripeCustomer;
+use Ghijk\DonationCheckout\Http\Requests\DonationRequest;
+use Ghijk\DonationCheckout\Actions\CreateRecurringDonation;
 
 class StartDonationController extends Controller
 {
     public function __invoke(
         DonationRequest $donationRequest,
-        PaymentService $paymentService,
+        CreateStripeCustomer $createStripeCustomer,
+        CreateSingleDonation $createSingleDonation,
+        CreateRecurringDonation $createRecurringDonation,
         UserService $userService
     ): JsonResponse {
         $validated = $donationRequest->validated();
@@ -27,40 +31,31 @@ class StartDonationController extends Controller
             );
         }
 
-        if (! $user->stripe_customer_id) {
-            $userService->updateUser(
-                $user,
-                [
-                    'stripe_customer_id' => $paymentService->createCustomer(
-                        email: $validated['email'],
-                        name: $validated['first_name'].' '.$validated['last_name']
-                    )->id,
-                ]
+        $stripeCustomerId = $user->stripe_customer_id;
+
+        if (! $stripeCustomerId) {
+            $customer = $createStripeCustomer(
+                email: $validated['email'],
+                name: "{$validated['first_name']} {$validated['last_name']}"
             );
+
+            $stripeCustomerId = $customer->id;
+
+            $userService->updateUser($user, [
+                'stripe_customer_id' => $stripeCustomerId,
+            ]);
         }
 
-        $session = null;
-
-        if ($validated['frequency'] === 'single') {
-            $session = $paymentService->singleDonation(
-                user: $user,
+        $session = match ($validated['frequency']) {
+            'single' => $createSingleDonation(
+                stripeCustomerId: $stripeCustomerId,
                 amount: $validated['amount']
-            );
-        }
-
-        if ($validated['frequency'] === 'recurring') {
-            $session = $paymentService->recurringDonation(
-                user: $user,
+            ),
+            'recurring' => $createRecurringDonation(
+                stripeCustomerId: $stripeCustomerId,
                 amount: $validated['amount']
-            );
-        }
-
-        if (! $session) {
-            return response()->json([
-                'message' => 'Invalid frequency specified.',
-                'frequency_received' => $validated['frequency'],
-            ], 422);
-        }
+            ),
+        };
 
         return response()->json([
             'url' => $session->url,
