@@ -39,13 +39,22 @@
     },
     "require-dev": {
         "laravel/pint": "^1.18",
+        "orchestra/testbench": "^10.0",
         "pestphp/pest": "^3.0",
+        "rector/rector": "^2.3",
         "spatie/ray": "^1.41"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ghijk\\DonationCheckout\\Tests\\": "tests"
+        }
     },
     "scripts": {
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "format": "vendor/bin/pint",
+        "refactor": "vendor/bin/rector",
+        "refactor-dry": "vendor/bin/rector --dry-run"
     },
     "config": {
         "sort-packages": true,
