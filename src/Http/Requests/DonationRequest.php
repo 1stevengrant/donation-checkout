@@ -14,11 +14,11 @@ class DonationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'required|numeric|min:1|max:999999',
-            'email' => 'required|email',
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'frequency' => 'required|string',
+            'amount' => ['required', 'integer', 'min:1', 'max:999999'],
+            'email' => ['required', 'email'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'frequency' => ['required', 'string', 'in:single,recurring'],
         ];
     }
 }
