@@ -1,5 +1,6 @@
 <form id="donation-form" class="donation-form" method="post">
     @php $freq = $frequency ?? config('donation-checkout.default_frequency', 'recurring') @endphp
+    <input type="hidden" name="frequency" id="donation-frequency" value="{{ $freq }}">
     <div class="donation-frequency">
         <button type="button"
                 class="donation-frequency-btn{{ $freq === 'recurring' ? ' active' : '' }}"
@@ -32,6 +33,7 @@
                id="donation-amount"
                value="{{ $default }}"
                min="1"
+               max="999999"
                required>
     </label>
 

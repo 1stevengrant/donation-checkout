@@ -21,6 +21,7 @@
             document.querySelectorAll('.donation-frequency-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             frequency = this.dataset.frequency;
+            document.getElementById('donation-frequency').value = frequency;
         });
     });
 
