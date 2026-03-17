@@ -2,12 +2,12 @@
 
 namespace Ghijk\DonationCheckout\Services;
 
-use Illuminate\Support\Str;
 use Statamic\Facades\User;
+use Illuminate\Support\Str;
 
 class UserService
 {
-    public function findByEmail(string $email)
+    public function findByEmail(string $email): mixed
     {
         return User::findByEmail($email);
     }
@@ -16,7 +16,7 @@ class UserService
         string $firstName,
         string $lastName,
         string $email
-    ) {
+    ): mixed {
         $user = User::make()->email($email);
         $user->password(Str::random(16))
             ->data([
@@ -28,9 +28,9 @@ class UserService
         return $user;
     }
 
-    public function updateUser($user, $data)
+    public function updateUser($user, array $data): mixed
     {
-        $user->data($data);
+        $user->merge($data);
         $user->save();
 
         return $user;
