@@ -29,6 +29,14 @@ class Donation extends Tags
     }
 
     /**
+     * {{ donation:styles }} - Outputs default CSS styles for the donation form
+     */
+    public function styles(): string
+    {
+        return view('donation-checkout::styles')->render();
+    }
+
+    /**
      * {{ donation:scripts }} - Outputs the vanilla JavaScript component script
      */
     public function scripts(): string
