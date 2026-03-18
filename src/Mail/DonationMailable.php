@@ -20,7 +20,7 @@ abstract class DonationMailable extends Mailable
     public function __construct()
     {
         $this->logoUrl = Settings::emailLogoUrl();
-        $this->orgName = Settings::emailOrgName();
+        $this->orgName = Settings::emailOrgName() ?: 'The Team';
         $this->accentColor = Settings::emailAccentColor();
     }
 }
