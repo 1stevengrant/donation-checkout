@@ -44,13 +44,12 @@ class StripeWebhookController extends Controller
 
         $this->clearStripeCache($customerId);
 
-        DonationCompleted::dispatch(
-            $customerId,
-            $session->id,
-            $session->mode,
-            $session->amount_total ?? 0,
-            $session->currency ?? config('donation-checkout.stripe_currency'),
-        );
+        $amount = $session->amount_total ?? 0;
+        $currency = $session->currency ?? config('donation-checkout.stripe_currency');
+
+        DonationCompleted::dispatch($customerId, $session->id, $session->mode, $amount, $currency);
+
+        $this->notifyDonationCompleted($customerId, $session->mode, $amount, $currency);
     }
 
     private function handleSubscriptionUpdated(object $subscription): void

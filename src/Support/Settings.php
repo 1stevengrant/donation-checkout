@@ -87,4 +87,24 @@ class Settings
     {
         return (string) static::get('resumed_email_body', 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.');
     }
+
+    public static function singleDonationEmailHeading(): string
+    {
+        return (string) static::get('single_email_heading', 'Thank You for Your Donation');
+    }
+
+    public static function singleDonationEmailBody(): string
+    {
+        return (string) static::get('single_email_body', 'Thank you for your generous donation. Your contribution makes a real difference and we are truly grateful for your support.');
+    }
+
+    public static function recurringDonationEmailHeading(): string
+    {
+        return (string) static::get('recurring_email_heading', 'Thank You for Your Monthly Donation');
+    }
+
+    public static function recurringDonationEmailBody(): string
+    {
+        return (string) static::get('recurring_email_body', 'Thank you for setting up a recurring donation. Your ongoing support helps us plan for the future and makes a lasting difference.');
+    }
 }
