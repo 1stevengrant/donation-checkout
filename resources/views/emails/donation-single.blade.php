@@ -56,7 +56,7 @@
                     {{ $heading }}
                   </h1>
                   <p style="margin: 0px 0px 1rem; font-size: 1rem; line-height: 1.5rem; color: rgb(71, 85, 105);">
-                    Dear {{ $donorName }},
+                    {{ $greeting }}
                   </p>
                   <p style="margin: 0px 0px 1.5rem; font-size: 1rem; line-height: 1.5rem; color: rgb(71, 85, 105);">
                     {{ $body }}

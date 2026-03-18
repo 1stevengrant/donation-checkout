@@ -4,6 +4,7 @@ namespace Ghijk\DonationCheckout\Concerns;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use Ghijk\DonationCheckout\Support\Settings;
 use Ghijk\DonationCheckout\Services\UserService;
 use Ghijk\DonationCheckout\Mail\SingleDonationMail;
 use Ghijk\DonationCheckout\Mail\RecurringDonationMail;
@@ -28,7 +29,7 @@ trait SendsDonorNotifications
 
         Cache::put($cacheKey, true, 60);
 
-        Mail::to($user->email())->send(new SubscriptionPausedMail($this->donorName($user)));
+        Mail::to($user->email())->send(new SubscriptionPausedMail(Settings::resolveGreeting($user)));
     }
 
     private function notifyDonorResumed(string $stripeCustomerId): void
@@ -47,7 +48,7 @@ trait SendsDonorNotifications
 
         Cache::put($cacheKey, true, 60);
 
-        Mail::to($user->email())->send(new SubscriptionResumedMail($this->donorName($user)));
+        Mail::to($user->email())->send(new SubscriptionResumedMail(Settings::resolveGreeting($user)));
     }
 
     private function notifyDonationCompleted(string $stripeCustomerId, string $mode, int $amountInCents, string $currency): void
@@ -62,20 +63,13 @@ trait SendsDonorNotifications
             return;
         }
 
-        $name = $this->donorName($user);
+        $greeting = Settings::resolveGreeting($user);
         $amount = $amountInCents / 100;
 
         $mail = $mode === 'subscription'
-            ? new RecurringDonationMail($name, $amount, $currency)
-            : new SingleDonationMail($name, $amount, $currency);
+            ? new RecurringDonationMail($greeting, $amount, $currency)
+            : new SingleDonationMail($greeting, $amount, $currency);
 
         Mail::to($user->email())->send($mail);
-    }
-
-    private function donorName($user): string
-    {
-        return mb_trim($user->get('first_name') . ' ' . $user->get('last_name'))
-            ?: $user->get('name')
-            ?: 'Supporter';
     }
 }

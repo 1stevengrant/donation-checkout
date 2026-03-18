@@ -13,15 +13,18 @@ class RecurringDonationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public readonly string $subjectLine;
+
     public readonly string $heading;
 
     public readonly string $body;
 
     public function __construct(
-        public readonly string $donorName,
+        public readonly string $greeting,
         public readonly float $amount,
         public readonly string $currency
     ) {
+        $this->subjectLine = Settings::recurringDonationEmailSubject();
         $this->heading = Settings::recurringDonationEmailHeading();
         $this->body = Settings::recurringDonationEmailBody();
     }
@@ -29,7 +32,7 @@ class RecurringDonationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->heading,
+            subject: $this->subjectLine,
         );
     }
 

@@ -13,13 +13,16 @@ class SubscriptionResumedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public readonly string $subjectLine;
+
     public readonly string $heading;
 
     public readonly string $body;
 
     public function __construct(
-        public readonly string $donorName
+        public readonly string $greeting
     ) {
+        $this->subjectLine = Settings::resumedEmailSubject();
         $this->heading = Settings::resumedEmailHeading();
         $this->body = Settings::resumedEmailBody();
     }
@@ -27,7 +30,7 @@ class SubscriptionResumedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->heading,
+            subject: $this->subjectLine,
         );
     }
 

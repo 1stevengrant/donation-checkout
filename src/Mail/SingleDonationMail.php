@@ -13,15 +13,18 @@ class SingleDonationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public readonly string $subjectLine;
+
     public readonly string $heading;
 
     public readonly string $body;
 
     public function __construct(
-        public readonly string $donorName,
+        public readonly string $greeting,
         public readonly float $amount,
         public readonly string $currency
     ) {
+        $this->subjectLine = Settings::singleDonationEmailSubject();
         $this->heading = Settings::singleDonationEmailHeading();
         $this->body = Settings::singleDonationEmailBody();
     }
@@ -29,7 +32,7 @@ class SingleDonationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->heading,
+            subject: $this->subjectLine,
         );
     }
 

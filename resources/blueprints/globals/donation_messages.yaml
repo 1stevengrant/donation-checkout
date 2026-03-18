@@ -112,13 +112,31 @@ tabs:
     display: Emails
     sections:
       -
+        display: General
+        fields:
+          -
+            handle: email_greeting
+            field:
+              type: text
+              display: Greeting
+              instructions: 'The greeting line used in all emails. Available placeholders: {first_name}, {last_name}, {name}, {email}'
+              default: 'Hi {first_name},'
+      -
         display: Subscription Paused
         fields:
+          -
+            handle: paused_email_subject
+            field:
+              type: text
+              display: Subject
+              instructions: 'The email subject line.'
+              default: 'Thank You for Your Support'
           -
             handle: paused_email_heading
             field:
               type: text
               display: Heading
+              instructions: 'The heading shown inside the email body.'
               default: 'Thank You for Your Support'
           -
             handle: paused_email_body
@@ -130,6 +148,12 @@ tabs:
       -
         display: Subscription Resumed
         fields:
+          -
+            handle: resumed_email_subject
+            field:
+              type: text
+              display: Subject
+              default: 'Your Donation Has Been Resumed'
           -
             handle: resumed_email_heading
             field:
@@ -147,6 +171,12 @@ tabs:
         display: Single Donation Confirmation
         fields:
           -
+            handle: single_email_subject
+            field:
+              type: text
+              display: Subject
+              default: 'Thank You for Your Donation'
+          -
             handle: single_email_heading
             field:
               type: text
@@ -162,6 +192,12 @@ tabs:
       -
         display: Recurring Donation Confirmation
         fields:
+          -
+            handle: recurring_email_subject
+            field:
+              type: text
+              display: Subject
+              default: 'Thank You for Your Monthly Donation'
           -
             handle: recurring_email_heading
             field:
