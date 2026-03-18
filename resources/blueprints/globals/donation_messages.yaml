@@ -1,4 +1,4 @@
-title: Donation Messages
+title: Donation Checkout Messages
 tabs:
   settings:
     display: Settings
@@ -46,8 +46,8 @@ tabs:
               instructions: 'Allow donors to cancel their own subscriptions from the portal.'
               default: true
               width: 50
-  thank_you_single:
-    display: 'Thank You: Single'
+  single:
+    display: Single Donations
     sections:
       -
         fields:
@@ -79,8 +79,8 @@ tabs:
               display: Button URL
               default: '/'
               width: 50
-  thank_you_recurring:
-    display: 'Thank You: Recurring'
+  recurring:
+    display: Recurring Donations
     sections:
       -
         fields:
@@ -112,141 +112,3 @@ tabs:
               display: Button URL
               default: '/'
               width: 50
-  email_branding:
-    display: 'Email Branding'
-    sections:
-      -
-        fields:
-          -
-            handle: email_logo
-            field:
-              type: assets
-              display: Logo
-              instructions: 'Logo image for emails (recommended: 200px wide, PNG or SVG).'
-              max_files: 1
-              container: assets
-          -
-            handle: email_org_name
-            field:
-              type: text
-              display: 'Organisation Name'
-              instructions: 'Shown in the email header when no logo is set, and in the footer.'
-              default: ''
-          -
-            handle: email_accent_color
-            field:
-              type: color
-              display: 'Accent Colour'
-              instructions: 'Used for the header background, buttons, and highlights.'
-              default: '#4f46e5'
-          -
-            handle: email_greeting
-            field:
-              type: text
-              display: Greeting
-              instructions: 'The greeting line used in all emails. Available placeholders: {first_name}, {last_name}, {name}, {email}'
-              default: 'Hi {first_name},'
-  email_single:
-    display: 'Email: Donation'
-    sections:
-      -
-        fields:
-          -
-            handle: single_email_subject
-            field:
-              type: text
-              display: Subject
-              default: 'Thank You for Your Donation'
-              width: 50
-          -
-            handle: single_email_heading
-            field:
-              type: text
-              display: Heading
-              default: 'Thank You for Your Donation'
-              width: 50
-          -
-            handle: single_email_body
-            field:
-              type: textarea
-              display: Body
-              instructions: 'The main message sent after a single donation is completed.'
-              default: 'Thank you for your generous donation. Your contribution makes a real difference and we are truly grateful for your support.'
-  email_recurring:
-    display: 'Email: Recurring'
-    sections:
-      -
-        fields:
-          -
-            handle: recurring_email_subject
-            field:
-              type: text
-              display: Subject
-              default: 'Thank You for Your Monthly Donation'
-              width: 50
-          -
-            handle: recurring_email_heading
-            field:
-              type: text
-              display: Heading
-              default: 'Thank You for Your Monthly Donation'
-              width: 50
-          -
-            handle: recurring_email_body
-            field:
-              type: textarea
-              display: Body
-              instructions: 'The main message sent after a recurring donation is set up.'
-              default: 'Thank you for setting up a recurring donation. Your ongoing support helps us plan for the future and makes a lasting difference.'
-  email_paused:
-    display: 'Email: Paused'
-    sections:
-      -
-        fields:
-          -
-            handle: paused_email_subject
-            field:
-              type: text
-              display: Subject
-              default: 'Thank You for Your Support'
-              width: 50
-          -
-            handle: paused_email_heading
-            field:
-              type: text
-              display: Heading
-              default: 'Thank You for Your Support'
-              width: 50
-          -
-            handle: paused_email_body
-            field:
-              type: textarea
-              display: Body
-              instructions: 'The main message sent when a subscription is paused.'
-              default: 'We wanted to reach out to let you know that your recurring donation has been paused. Thank you so much for the support you have given us. Your generosity has made a real difference, and we are truly grateful for every contribution. If you ever wish to resume your donation, you are welcome to do so at any time.'
-  email_resumed:
-    display: 'Email: Resumed'
-    sections:
-      -
-        fields:
-          -
-            handle: resumed_email_subject
-            field:
-              type: text
-              display: Subject
-              default: 'Your Donation Has Been Resumed'
-              width: 50
-          -
-            handle: resumed_email_heading
-            field:
-              type: text
-              display: Heading
-              default: 'Your Donation Has Been Resumed'
-              width: 50
-          -
-            handle: resumed_email_body
-            field:
-              type: textarea
-              display: Body
-              instructions: 'The main message sent when a subscription is resumed.'
-              default: 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.'

@@ -75,6 +75,8 @@ class ServiceProvider extends AddonServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/blueprints/globals/donation_messages.yaml' => resource_path('blueprints/globals/donation_messages.yaml'),
             __DIR__ . '/../resources/content/globals/donation_messages.yaml' => base_path('content/globals/donation_messages.yaml'),
+            __DIR__ . '/../resources/blueprints/globals/donation_emails.yaml' => resource_path('blueprints/globals/donation_emails.yaml'),
+            __DIR__ . '/../resources/content/globals/donation_emails.yaml' => base_path('content/globals/donation_emails.yaml'),
         ], 'donation-checkout-global-set');
 
         $this->registerWebhookRoute();
@@ -120,15 +122,7 @@ class ServiceProvider extends AddonServiceProvider
     private function installGlobalSet(): void
     {
         Statamic::afterInstalled(function (): void {
-            if (GlobalSet::findByHandle('donation_messages')) {
-                return;
-            }
-
-            $set = GlobalSet::make('donation_messages')->title('Donation Messages');
-            $set->save();
-
-            $variables = $set->makeLocalization(Statamic::default());
-            $variables->data([
+            $this->installGlobal('donation_messages', 'Donation Checkout Messages', [
                 'single_heading' => 'Thank you for your donation!',
                 'single_message' => 'Your generous contribution makes a real difference.',
                 'single_cta_text' => 'Return home',
@@ -138,7 +132,24 @@ class ServiceProvider extends AddonServiceProvider
                 'recurring_cta_text' => 'Return home',
                 'recurring_cta_url' => '/',
             ]);
-            $variables->save();
+
+            $this->installGlobal('donation_emails', 'Donation Checkout Emails');
         });
+    }
+
+    private function installGlobal(string $handle, string $title, array $data = []): void
+    {
+        if (GlobalSet::findByHandle($handle)) {
+            return;
+        }
+
+        $set = GlobalSet::make($handle)->title($title);
+        $set->save();
+
+        if ($data) {
+            $variables = $set->makeLocalization(Statamic::default());
+            $variables->data($data);
+            $variables->save();
+        }
     }
 }
