@@ -2,6 +2,7 @@
 
 namespace Ghijk\DonationCheckout\Support;
 
+use Statamic\Facades\Asset;
 use Statamic\Facades\GlobalSet;
 
 class Settings
@@ -70,7 +71,23 @@ class Settings
 
     public static function emailLogoUrl(): string
     {
-        return (string) static::get('email_logo_url', '');
+        $logo = static::get('email_logo');
+
+        if (! $logo) {
+            return '';
+        }
+
+        if (is_string($logo)) {
+            try {
+                $asset = Asset::find($logo);
+
+                return $asset ? (string) $asset->absoluteUrl() : '';
+            } catch (\Exception) {
+                return '';
+            }
+        }
+
+        return '';
     }
 
     public static function emailOrgName(): string
