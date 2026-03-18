@@ -4,6 +4,7 @@ namespace Ghijk\DonationCheckout\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Statamic\Http\Controllers\Controller;
+use Ghijk\DonationCheckout\Support\Settings;
 use Ghijk\DonationCheckout\Services\UserService;
 use Ghijk\DonationCheckout\Actions\CreateSingleDonation;
 use Ghijk\DonationCheckout\Actions\CreateStripeCustomer;
@@ -46,19 +47,45 @@ class StartDonationController extends Controller
             ]);
         }
 
+        $metadata = $this->collectMetadata($validated);
+
         $session = match ($validated['frequency']) {
             'single' => $createSingleDonation(
                 stripeCustomerId: $stripeCustomerId,
-                amount: $validated['amount']
+                amount: $validated['amount'],
+                metadata: $metadata,
             ),
             'recurring' => $createRecurringDonation(
                 stripeCustomerId: $stripeCustomerId,
-                amount: $validated['amount']
+                amount: $validated['amount'],
+                metadata: $metadata,
             ),
         };
 
         return response()->json([
             'url' => $session->url,
         ]);
+    }
+
+    private function collectMetadata(array $validated): array
+    {
+        $customFields = Settings::customFields();
+
+        if (empty($customFields)) {
+            return [];
+        }
+
+        $metadata = [];
+
+        foreach ($customFields as $field => $config) {
+            if (isset($validated[$field])) {
+                $value = $validated[$field];
+                $metadata[$field] = ($config['type'] ?? '') === 'checkbox'
+                    ? ($value ? 'yes' : 'no')
+                    : (string) $value;
+            }
+        }
+
+        return $metadata;
     }
 }

@@ -1,0 +1,110 @@
+title: Donation Messages
+tabs:
+  settings:
+    display: Settings
+    sections:
+      -
+        fields:
+          -
+            handle: collect_billing_address
+            field:
+              type: toggle
+              display: 'Collect Billing Address'
+              instructions: 'Require billing address on Stripe Checkout. Needed for Gift Aid / HMRC compliance.'
+              default: false
+              width: 50
+          -
+            handle: gift_aid_enabled
+            field:
+              type: toggle
+              display: 'Enable Gift Aid'
+              instructions: 'Show a Gift Aid declaration checkbox on the donation form.'
+              default: false
+              width: 50
+          -
+            handle: gift_aid_label
+            field:
+              type: text
+              display: 'Gift Aid Label'
+              instructions: 'The label shown next to the Gift Aid checkbox.'
+              default: 'Boost your donation by 25% with Gift Aid'
+              if:
+                gift_aid_enabled: 'equals true'
+          -
+            handle: donor_portal_enabled
+            field:
+              type: toggle
+              display: 'Enable Donor Portal'
+              instructions: 'Allow donors to view their donation history via a magic link.'
+              default: true
+              width: 50
+          -
+            handle: donor_can_cancel
+            field:
+              type: toggle
+              display: 'Donors Can Cancel'
+              instructions: 'Allow donors to cancel their own subscriptions from the portal.'
+              default: true
+              width: 50
+  single:
+    display: Single Donations
+    sections:
+      -
+        fields:
+          -
+            handle: single_heading
+            field:
+              type: text
+              display: Heading
+              instructions: 'Heading shown after a single donation'
+              default: 'Thank you for your donation!'
+          -
+            handle: single_message
+            field:
+              type: textarea
+              display: Message
+              instructions: 'Message shown after a single donation'
+              default: 'Your generous contribution makes a real difference.'
+          -
+            handle: single_cta_text
+            field:
+              type: text
+              display: Button Text
+              default: 'Return home'
+          -
+            handle: single_cta_url
+            field:
+              type: text
+              display: Button URL
+              default: '/'
+  recurring:
+    display: Recurring Donations
+    sections:
+      -
+        fields:
+          -
+            handle: recurring_heading
+            field:
+              type: text
+              display: Heading
+              instructions: 'Heading shown after a recurring donation'
+              default: 'Thank you for your monthly donation!'
+          -
+            handle: recurring_message
+            field:
+              type: textarea
+              display: Message
+              instructions: 'Message shown after a recurring donation'
+              default: 'Your ongoing support helps us plan for the future.'
+          -
+            handle: recurring_cta_text
+            field:
+              type: text
+              display: Button Text
+              default: 'Return home'
+          -
+            handle: recurring_cta_url
+            field:
+              type: text
+              display: Button URL
+              default: '/'
