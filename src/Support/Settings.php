@@ -68,6 +68,11 @@ class Settings
         return $fields;
     }
 
+    public static function pausedEmailSubject(): string
+    {
+        return (string) static::get('paused_email_subject', 'Thank You for Your Support');
+    }
+
     public static function pausedEmailHeading(): string
     {
         return (string) static::get('paused_email_heading', 'Thank You for Your Support');
@@ -76,6 +81,11 @@ class Settings
     public static function pausedEmailBody(): string
     {
         return (string) static::get('paused_email_body', 'We wanted to reach out to let you know that your recurring donation has been paused. Thank you so much for the support you have given us. Your generosity has made a real difference, and we are truly grateful for every contribution. If you ever wish to resume your donation, you are welcome to do so at any time.');
+    }
+
+    public static function resumedEmailSubject(): string
+    {
+        return (string) static::get('resumed_email_subject', 'Your Donation Has Been Resumed');
     }
 
     public static function resumedEmailHeading(): string
@@ -88,6 +98,36 @@ class Settings
         return (string) static::get('resumed_email_body', 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.');
     }
 
+    public static function emailGreeting(): string
+    {
+        return (string) static::get('email_greeting', 'Hi {first_name},');
+    }
+
+    public static function resolveGreeting($user): string
+    {
+        $template = static::emailGreeting();
+
+        $firstName = $user->get('first_name') ?? '';
+        $lastName = $user->get('last_name') ?? '';
+        $name = mb_trim("{$firstName} {$lastName}") ?: ($user->get('name') ?? '');
+        $email = method_exists($user, 'email') ? $user->email() : ($user->get('email') ?? '');
+
+        if (! $firstName && $name) {
+            $firstName = explode(' ', $name)[0];
+        }
+
+        return str_replace(
+            ['{first_name}', '{last_name}', '{name}', '{email}'],
+            [$firstName ?: 'there', $lastName, $name ?: $email, $email],
+            $template
+        );
+    }
+
+    public static function singleDonationEmailSubject(): string
+    {
+        return (string) static::get('single_email_subject', 'Thank You for Your Donation');
+    }
+
     public static function singleDonationEmailHeading(): string
     {
         return (string) static::get('single_email_heading', 'Thank You for Your Donation');
@@ -96,6 +136,11 @@ class Settings
     public static function singleDonationEmailBody(): string
     {
         return (string) static::get('single_email_body', 'Thank you for your generous donation. Your contribution makes a real difference and we are truly grateful for your support.');
+    }
+
+    public static function recurringDonationEmailSubject(): string
+    {
+        return (string) static::get('recurring_email_subject', 'Thank You for Your Monthly Donation');
     }
 
     public static function recurringDonationEmailHeading(): string
