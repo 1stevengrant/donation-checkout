@@ -2,17 +2,12 @@
 
 namespace Ghijk\DonationCheckout\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 use Ghijk\DonationCheckout\Support\Settings;
 
-class SubscriptionResumedMail extends Mailable
+class SubscriptionResumedMail extends DonationMailable
 {
-    use Queueable, SerializesModels;
-
     public readonly string $subjectLine;
 
     public readonly string $heading;
@@ -22,6 +17,7 @@ class SubscriptionResumedMail extends Mailable
     public function __construct(
         public readonly string $greeting
     ) {
+        parent::__construct();
         $this->subjectLine = Settings::resumedEmailSubject();
         $this->heading = Settings::resumedEmailHeading();
         $this->body = Settings::resumedEmailBody();

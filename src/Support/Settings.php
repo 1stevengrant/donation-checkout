@@ -68,6 +68,21 @@ class Settings
         return $fields;
     }
 
+    public static function emailLogoUrl(): string
+    {
+        return (string) static::get('email_logo_url', '');
+    }
+
+    public static function emailOrgName(): string
+    {
+        return (string) static::get('email_org_name', config('app.name', ''));
+    }
+
+    public static function emailAccentColor(): string
+    {
+        return (string) static::get('email_accent_color', '#4f46e5');
+    }
+
     public static function pausedEmailSubject(): string
     {
         return (string) static::get('paused_email_subject', 'Thank You for Your Support');

@@ -2,17 +2,12 @@
 
 namespace Ghijk\DonationCheckout\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 use Ghijk\DonationCheckout\Support\Settings;
 
-class RecurringDonationMail extends Mailable
+class RecurringDonationMail extends DonationMailable
 {
-    use Queueable, SerializesModels;
-
     public readonly string $subjectLine;
 
     public readonly string $heading;
@@ -24,6 +19,7 @@ class RecurringDonationMail extends Mailable
         public readonly float $amount,
         public readonly string $currency
     ) {
+        parent::__construct();
         $this->subjectLine = Settings::recurringDonationEmailSubject();
         $this->heading = Settings::recurringDonationEmailHeading();
         $this->body = Settings::recurringDonationEmailBody();

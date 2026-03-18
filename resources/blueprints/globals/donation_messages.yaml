@@ -112,8 +112,30 @@ tabs:
     display: Emails
     sections:
       -
-        display: General
+        display: Branding
         fields:
+          -
+            handle: email_logo_url
+            field:
+              type: text
+              display: 'Logo URL'
+              instructions: 'Full URL to your logo image for emails (recommended: 200px wide, PNG or SVG).'
+              input_type: url
+              placeholder: 'https://example.com/logo.png'
+          -
+            handle: email_org_name
+            field:
+              type: text
+              display: 'Organisation Name'
+              instructions: 'Shown in the email header when no logo is set, and in the footer.'
+              default: ''
+          -
+            handle: email_accent_color
+            field:
+              type: color
+              display: 'Accent Colour'
+              instructions: 'Used for the header background, buttons, and highlights.'
+              default: '#4f46e5'
           -
             handle: email_greeting
             field:

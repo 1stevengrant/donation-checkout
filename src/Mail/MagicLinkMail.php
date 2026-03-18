@@ -2,19 +2,16 @@
 
 namespace Ghijk\DonationCheckout\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 
-class MagicLinkMail extends Mailable
+class MagicLinkMail extends DonationMailable
 {
-    use Queueable, SerializesModels;
-
     public function __construct(
         public readonly string $url
-    ) {}
+    ) {
+        parent::__construct();
+    }
 
     public function envelope(): Envelope
     {
