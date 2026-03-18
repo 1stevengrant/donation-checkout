@@ -54,17 +54,24 @@ Add the CSRF meta tag to your layout's `<head>`:
 <meta name="csrf-token" content="{{ csrf_token }}">
 ```
 
-Add the form to your template:
+Add the form and scripts to your template:
 
 ```antlers
 {{ donation:form }}
-```
-
-Add the JavaScript before your closing `</body>` tag:
-
-```antlers
 {{ donation:scripts }}
 ```
+
+### Default Styles (Optional)
+
+The form ships unstyled by default. To include the built-in styles, add the styles tag to your template (ideally before the form):
+
+```antlers
+{{ donation:styles }}
+{{ donation:form }}
+{{ donation:scripts }}
+```
+
+This outputs a `<style>` block with sensible defaults. If you prefer to write your own CSS, simply omit the tag and target the `.donation-*` classes listed below.
 
 ### Customising the Form
 
@@ -96,6 +103,7 @@ This will copy the views to `resources/views/vendor/donation-checkout/`:
 
 - `form.blade.php` - The donation form markup
 - `scripts.blade.php` - The vanilla JavaScript component
+- `styles.blade.php` - The default CSS styles
 
 You can then edit these files to match your site's design. The form uses CSS classes prefixed with `donation-` for easy styling:
 
@@ -115,6 +123,7 @@ You can then edit these files to match your site's design. The form uses CSS cla
 
 | Tag | Description |
 |-----|-------------|
+| `{{ donation:styles }}` | Outputs default CSS styles (optional) |
 | `{{ donation:stripe_key }}` | Outputs your Stripe publishable key |
 | `{{ donation:endpoint }}` | Outputs the API endpoint URL |
 | `{{ donation:currency }}` | Outputs the configured currency code |
