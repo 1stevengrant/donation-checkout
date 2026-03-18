@@ -21,7 +21,7 @@
   <![endif]-->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" media="screen">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" media="screen">
   <style>
     @tailwind components;
     @tailwind utilities;
@@ -31,27 +31,55 @@
     }
   </style>
 </head>
-<body class="m-0 p-0 w-full [word-break:break-word] [-webkit-font-smoothing:antialiased] bg-slate-100">
+<body class="m-0 p-0 w-full [word-break:break-word] [-webkit-font-smoothing:antialiased] bg-amber-50">
   <div role="article" aria-roledescription="email" lang="en">
-    <div class="bg-slate-100 font-inter sm:px-4">
+    <div class="bg-amber-50 font-inter sm:px-4">
       <table align="center" class="m-0 mx-auto">
         <tr>
-          <td class="w-[552px] max-w-full">
-            <div class="h-8"></div>
+          <td class="w-[600px] max-w-full">
+            <div class="h-6"></div>
 
-            <table class="w-full">
+            <!-- Header band -->
+            <table class="w-full" role="presentation">
               <tr>
-                <td class="py-8 px-10 sm:p-6 bg-white [border:1px_solid_theme(colors.slate.200)] rounded-lg">
-                  <yield />
+                <td style="background-color: {{ $accentColor }};" class="rounded-t-2xl px-10 py-5 sm:px-6 text-center">
+                  @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="{{ $orgName }}" width="160" class="mx-auto">
+                  @elseif($orgName)
+                    <p class="m-0 text-white text-xl font-extrabold tracking-tight">{{ $orgName }}</p>
+                  @endif
                 </td>
               </tr>
             </table>
 
-            <table class="w-full">
+            <!-- Content card -->
+            <table class="w-full" role="presentation">
+              <tr>
+                <td class="bg-white px-10 py-10 sm:p-6 rounded-b-2xl [border:1px_solid_theme(colors.amber.200)] border-t-0">
+                  <yield />
+
+                  <!-- Sign-off -->
+                  <table class="w-full [border-top:2px_solid_theme(colors.amber.100)]" role="presentation">
+                    <tr>
+                      <td class="pt-6">
+                        <p class="m-0 text-base/6 text-slate-500">
+                          With gratitude,
+                          <br>
+                          <span class="font-bold text-slate-700">{{ $orgName ?: 'The Team' }}</span>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Footer -->
+            <table class="w-full" role="presentation">
               <tr>
                 <td class="py-6 px-10 sm:px-6 text-center">
-                  <p class="m-0 text-xs text-slate-400">
-                    You received this email because you made a donation. If you believe this was sent in error, please disregard it.
+                  <p class="m-0 text-xs text-amber-600/60">
+                    You received this email because you made a donation.
                   </p>
                 </td>
               </tr>

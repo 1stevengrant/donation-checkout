@@ -3,27 +3,17 @@ preheader: Thank you for your support
 ---
 
 <x-main>
-  <h1 class="m-0 mb-6 text-2xl/8 text-slate-900 font-semibold">
+  <h1 class="m-0 mb-2 text-3xl/9 text-slate-900 font-extrabold tracking-tight">
     {{ $heading }}
   </h1>
 
-  <p class="m-0 mb-4 text-base/6 text-slate-600">
+  <div class="h-4"></div>
+
+  <p class="m-0 mb-4 text-base/7 text-slate-600">
     {{ $greeting }}
   </p>
 
-  <p class="m-0 mb-6 text-base/6 text-slate-600">
+  <p class="m-0 mb-8 text-base/7 text-slate-600">
     {{ $body }}
   </p>
-
-  <table class="w-full [border-top:1px_solid_theme(colors.slate.200)]" role="presentation">
-    <tr>
-      <td class="pt-6">
-        <p class="m-0 text-base/6 text-slate-600">
-          With gratitude,
-          <br>
-          <span class="font-semibold text-slate-900">The Team</span>
-        </p>
-      </td>
-    </tr>
-  </table>
 </x-main>
