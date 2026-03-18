@@ -46,8 +46,8 @@ tabs:
               instructions: 'Allow donors to cancel their own subscriptions from the portal.'
               default: true
               width: 50
-  single:
-    display: Single Donations
+  thank_you_single:
+    display: 'Thank You: Single'
     sections:
       -
         fields:
@@ -56,14 +56,14 @@ tabs:
             field:
               type: text
               display: Heading
-              instructions: 'Heading shown after a single donation'
+              instructions: 'Heading shown on the thank you page after a single donation.'
               default: 'Thank you for your donation!'
           -
             handle: single_message
             field:
               type: textarea
               display: Message
-              instructions: 'Message shown after a single donation'
+              instructions: 'Message shown on the thank you page after a single donation.'
               default: 'Your generous contribution makes a real difference.'
           -
             handle: single_cta_text
@@ -71,14 +71,16 @@ tabs:
               type: text
               display: Button Text
               default: 'Return home'
+              width: 50
           -
             handle: single_cta_url
             field:
               type: text
               display: Button URL
               default: '/'
-  recurring:
-    display: Recurring Donations
+              width: 50
+  thank_you_recurring:
+    display: 'Thank You: Recurring'
     sections:
       -
         fields:
@@ -87,14 +89,14 @@ tabs:
             field:
               type: text
               display: Heading
-              instructions: 'Heading shown after a recurring donation'
+              instructions: 'Heading shown on the thank you page after a recurring donation.'
               default: 'Thank you for your monthly donation!'
           -
             handle: recurring_message
             field:
               type: textarea
               display: Message
-              instructions: 'Message shown after a recurring donation'
+              instructions: 'Message shown on the thank you page after a recurring donation.'
               default: 'Your ongoing support helps us plan for the future.'
           -
             handle: recurring_cta_text
@@ -102,17 +104,18 @@ tabs:
               type: text
               display: Button Text
               default: 'Return home'
+              width: 50
           -
             handle: recurring_cta_url
             field:
               type: text
               display: Button URL
               default: '/'
-  emails:
-    display: Emails
+              width: 50
+  email_branding:
+    display: 'Email Branding'
     sections:
       -
-        display: Branding
         fields:
           -
             handle: email_logo
@@ -143,54 +146,10 @@ tabs:
               display: Greeting
               instructions: 'The greeting line used in all emails. Available placeholders: {first_name}, {last_name}, {name}, {email}'
               default: 'Hi {first_name},'
+  email_single:
+    display: 'Email: Donation'
+    sections:
       -
-        display: Subscription Paused
-        fields:
-          -
-            handle: paused_email_subject
-            field:
-              type: text
-              display: Subject
-              instructions: 'The email subject line.'
-              default: 'Thank You for Your Support'
-          -
-            handle: paused_email_heading
-            field:
-              type: text
-              display: Heading
-              instructions: 'The heading shown inside the email body.'
-              default: 'Thank You for Your Support'
-          -
-            handle: paused_email_body
-            field:
-              type: textarea
-              display: Body
-              instructions: 'The main message sent when a subscription is paused.'
-              default: 'We wanted to reach out to let you know that your recurring donation has been paused. Thank you so much for the support you have given us. Your generosity has made a real difference, and we are truly grateful for every contribution. If you ever wish to resume your donation, you are welcome to do so at any time.'
-      -
-        display: Subscription Resumed
-        fields:
-          -
-            handle: resumed_email_subject
-            field:
-              type: text
-              display: Subject
-              default: 'Your Donation Has Been Resumed'
-          -
-            handle: resumed_email_heading
-            field:
-              type: text
-              display: Heading
-              default: 'Your Donation Has Been Resumed'
-          -
-            handle: resumed_email_body
-            field:
-              type: textarea
-              display: Body
-              instructions: 'The main message sent when a subscription is resumed.'
-              default: 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.'
-      -
-        display: Single Donation Confirmation
         fields:
           -
             handle: single_email_subject
@@ -198,12 +157,14 @@ tabs:
               type: text
               display: Subject
               default: 'Thank You for Your Donation'
+              width: 50
           -
             handle: single_email_heading
             field:
               type: text
               display: Heading
               default: 'Thank You for Your Donation'
+              width: 50
           -
             handle: single_email_body
             field:
@@ -211,8 +172,10 @@ tabs:
               display: Body
               instructions: 'The main message sent after a single donation is completed.'
               default: 'Thank you for your generous donation. Your contribution makes a real difference and we are truly grateful for your support.'
+  email_recurring:
+    display: 'Email: Recurring'
+    sections:
       -
-        display: Recurring Donation Confirmation
         fields:
           -
             handle: recurring_email_subject
@@ -220,12 +183,14 @@ tabs:
               type: text
               display: Subject
               default: 'Thank You for Your Monthly Donation'
+              width: 50
           -
             handle: recurring_email_heading
             field:
               type: text
               display: Heading
               default: 'Thank You for Your Monthly Donation'
+              width: 50
           -
             handle: recurring_email_body
             field:
@@ -233,3 +198,55 @@ tabs:
               display: Body
               instructions: 'The main message sent after a recurring donation is set up.'
               default: 'Thank you for setting up a recurring donation. Your ongoing support helps us plan for the future and makes a lasting difference.'
+  email_paused:
+    display: 'Email: Paused'
+    sections:
+      -
+        fields:
+          -
+            handle: paused_email_subject
+            field:
+              type: text
+              display: Subject
+              default: 'Thank You for Your Support'
+              width: 50
+          -
+            handle: paused_email_heading
+            field:
+              type: text
+              display: Heading
+              default: 'Thank You for Your Support'
+              width: 50
+          -
+            handle: paused_email_body
+            field:
+              type: textarea
+              display: Body
+              instructions: 'The main message sent when a subscription is paused.'
+              default: 'We wanted to reach out to let you know that your recurring donation has been paused. Thank you so much for the support you have given us. Your generosity has made a real difference, and we are truly grateful for every contribution. If you ever wish to resume your donation, you are welcome to do so at any time.'
+  email_resumed:
+    display: 'Email: Resumed'
+    sections:
+      -
+        fields:
+          -
+            handle: resumed_email_subject
+            field:
+              type: text
+              display: Subject
+              default: 'Your Donation Has Been Resumed'
+              width: 50
+          -
+            handle: resumed_email_heading
+            field:
+              type: text
+              display: Heading
+              default: 'Your Donation Has Been Resumed'
+              width: 50
+          -
+            handle: resumed_email_body
+            field:
+              type: textarea
+              display: Body
+              instructions: 'The main message sent when a subscription is resumed.'
+              default: 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.'
