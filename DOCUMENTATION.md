@@ -425,7 +425,7 @@ After a successful donation, donors can be redirected to a built-in thank you pa
 'recurring_donation_success_url' => '/donation-checkout/thank-you?session_id={CHECKOUT_SESSION_ID}',
 ```
 
-The thank you page displays a customisable heading, message, and call-to-action button. Edit the copy from the CP under **Globals > Donation Messages** (separate tabs for Single Donations and Recurring Donations).
+The thank you page displays a customisable heading, message, and call-to-action button. Edit the copy from the CP under **Globals > Donation Checkout Messages** (separate tabs for Single Donations and Recurring Donations).
 
 If you prefer to build your own thank you template, use the `{{ donation:thank_you }}` tag pair:
 
@@ -452,7 +452,7 @@ Gift Aid allows UK charities to claim an extra 25% on donations from UK taxpayer
 
 ### Enabling Gift Aid
 
-1. Go to **CP > Globals > Donation Messages > Settings**
+1. Go to **CP > Globals > Donation Checkout Messages > Settings**
 2. Enable **Gift Aid** (toggle switch)
 3. Optionally customise the label (default: "Boost your donation by 25% with Gift Aid")
 4. Enable **Collect Billing Address** (Stripe Checkout will require the donor's full address)
@@ -538,7 +538,7 @@ If you prefer to build your own portal template, use the `{{ donation:portal }}`
 
 ### Configuration
 
-The following portal settings can be changed from the CP under **Globals > Donation Messages > Settings**:
+The following portal settings can be changed from the CP under **Globals > Donation Checkout Messages > Settings**:
 
 - **Enable Donor Portal** (show/hide the magic link form)
 - **Donors Can Cancel** (allow donors to cancel their own subscriptions)
@@ -581,7 +581,7 @@ php artisan donation-checkout:setup-webhook --update
 
 | Stripe Event | What Happens |
 |---|---|
-| `checkout.session.completed` | Clears caches, dispatches `DonationCompleted` event |
+| `checkout.session.completed` | Sends donation confirmation email, clears caches, dispatches `DonationCompleted` event |
 | `customer.subscription.updated` | Detects pause/resume, sends donor email, dispatches `SubscriptionPaused`/`SubscriptionResumed`/`SubscriptionUpdated` |
 | `customer.subscription.deleted` | Clears caches, dispatches `SubscriptionCancelled` |
 | `charge.refunded` | Clears caches, dispatches `DonationRefunded` |
@@ -662,14 +662,61 @@ Add the Donation Stats widget to your dashboard via **CP > Dashboard**. It shows
 
 ### Donor Emails
 
-When a subscription is paused or resumed (from the CP or via Stripe webhook), the donor receives an email thanking them for their support. Email templates are publishable:
+Donors receive styled HTML emails at key moments in the donation lifecycle:
+
+| Email | Trigger |
+|---|---|
+| **Donation Confirmation** | Single donation completed via Stripe Checkout |
+| **Recurring Confirmation** | Monthly donation set up via Stripe Checkout |
+| **Subscription Paused** | Recurring donation paused from CP or Stripe Dashboard |
+| **Subscription Resumed** | Paused donation resumed |
+| **Magic Link** | Donor requests portal access |
+
+#### Email Branding
+
+Configure the email appearance from **CP > Globals > Donation Checkout Emails > Branding**:
+
+- **Logo**: upload via the asset picker (recommended: 200px wide, PNG or SVG)
+- **Organisation Name**: shown in the header when no logo is set, and in the sign-off
+- **Accent Colour**: used for the header band, buttons, and amount highlight boxes
+- **Greeting**: the opening line of every email, with placeholder support (`{first_name}`, `{last_name}`, `{name}`, `{email}`). Defaults to "Hi {first_name},"
+
+#### Email Content
+
+Each email type has its own tab in the Donation Checkout Emails global with customisable **subject line**, **heading**, and **body text**:
+
+- **Donation Confirmation** tab (single donations)
+- **Recurring Confirmation** tab (monthly donations)
+- **Subscription Paused** tab
+- **Subscription Resumed** tab
+
+The subject line controls what appears in the inbox. The heading is the bold title inside the email. The body is the main paragraph text.
+
+#### Publishing Email Templates
+
+The compiled email views are publishable for full markup control:
 
 ```bash
 php artisan vendor:publish --tag=donation-checkout-views
 ```
 
-Templates are in `resources/views/vendor/donation-checkout/emails/`:
+Templates in `resources/views/vendor/donation-checkout/emails/`:
 
+- `donation-single.blade.php`
+- `donation-recurring.blade.php`
 - `subscription-paused.blade.php`
 - `subscription-resumed.blade.php`
 - `magic-link.blade.php`
+
+#### Developing Email Templates
+
+Email source templates live in the `emails/` directory and use the [Maizzle](https://maizzle.com) framework with Tailwind CSS. To modify the email design:
+
+```bash
+cd emails
+npm install
+npm run dev     # preview with hot reload
+npm run build   # compile to resources/views/emails/
+```
+
+The production build inlines all CSS, adds Outlook compatibility, and outputs `.blade.php` files with Blade variables preserved. Only the compiled output is used at runtime.
