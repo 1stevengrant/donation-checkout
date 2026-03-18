@@ -23,8 +23,11 @@ You will need to add the following to your `.env` file:
 STRIPE_SECRET_KEY=
 STRIPE_PUBLISHABLE_KEY=
 ```
-Installing Donation Checkout will add a `donation-checkout.php` folder to your `config` folder. You will need to add
-`stripe_price_plan_id` and decide on the success urls for single and recurring donations.
+
+Installing Donation Checkout will add a `donation-checkout.php` file to your `config` folder. You will need to add
+`stripe_price_plan_id` and decide on the success URLs for single and recurring donations. Success and cancel URLs can be
+relative paths (e.g. `/donation-checkout/thank-you?session_id={CHECKOUT_SESSION_ID}`) and will be resolved to absolute
+URLs automatically.
 
 ### Frontend Implementation
 
@@ -118,6 +121,13 @@ You can then edit these files to match your site's design. The form uses CSS cla
 - `.donation-submit` - Submit button container
 - `.donation-submit-btn` - Submit button
 - `.donation-error` - Error message display
+- `.donation-toggle` - Toggle switch container (for checkbox custom fields)
+- `.donation-toggle-track` - Toggle switch track
+- `.donation-toggle-thumb` - Toggle switch thumb
+- `.donation-toggle-label` - Toggle switch label text
+- `.donation-magic-link` - Magic link form container
+- `.donation-magic-link-heading` - Magic link heading text
+- `.donation-portal-link` - Portal link (shown when logged in)
 
 ### Additional Tags
 
@@ -127,6 +137,10 @@ You can then edit these files to match your site's design. The form uses CSS cla
 | `{{ donation:stripe_key }}` | Outputs your Stripe publishable key |
 | `{{ donation:endpoint }}` | Outputs the API endpoint URL |
 | `{{ donation:currency }}` | Outputs the configured currency code |
+| `{{ donation:thank_you }}` | Tag pair with thank you page data (heading, message, amount, etc.) |
+| `{{ donation:magic_link_form }}` | Magic link email form (shows portal link when logged in) |
+| `{{ donation:portal }}` | Tag pair with donor's donations and subscriptions |
+| `{{ donation:portal_cancel_url :id="sub_id" }}` | Cancel URL for a subscription |
 
 ---
 
@@ -399,3 +413,310 @@ Both examples handle:
 7. **Loading state** - Disable the button and show feedback while processing
 
 On successful submission, the endpoint returns a Stripe Checkout URL and the user is redirected to complete their payment.
+
+---
+
+## Thank You Page
+
+After a successful donation, donors can be redirected to a built-in thank you page. Set your success URLs in `config/donation-checkout.php`:
+
+```php
+'single_donation_success_url' => '/donation-checkout/thank-you?session_id={CHECKOUT_SESSION_ID}',
+'recurring_donation_success_url' => '/donation-checkout/thank-you?session_id={CHECKOUT_SESSION_ID}',
+```
+
+The thank you page displays a customisable heading, message, and call-to-action button. Edit the copy from the CP under **Globals > Donation Checkout Messages** (separate tabs for Single Donations and Recurring Donations).
+
+If you prefer to build your own thank you template, use the `{{ donation:thank_you }}` tag pair:
+
+```antlers
+{{ donation:thank_you }}
+    <h1>{{ heading }}</h1>
+    <p>{{ currency | upper }} {{ amount }}</p>
+    <p>{{ message }}</p>
+    <a href="{{ cta_url }}">{{ cta_text }}</a>
+{{ /donation:thank_you }}
+```
+
+To publish the built-in thank you view for customisation:
+
+```bash
+php artisan vendor:publish --tag=donation-checkout-views
+```
+
+---
+
+## Gift Aid (UK)
+
+Gift Aid allows UK charities to claim an extra 25% on donations from UK taxpayers. Donation Checkout supports this with a toggle switch on the donation form and billing address collection for HMRC compliance.
+
+### Enabling Gift Aid
+
+1. Go to **CP > Globals > Donation Checkout Messages > Settings**
+2. Enable **Gift Aid** (toggle switch)
+3. Optionally customise the label (default: "Boost your donation by 25% with Gift Aid")
+4. Enable **Collect Billing Address** (Stripe Checkout will require the donor's full address)
+
+When enabled, the donation form displays a styled toggle switch. The donor's declaration is stored as `gift_aid: yes/no` in the Stripe session metadata, visible in both the CP donations listing and the Stripe Dashboard.
+
+### Custom Metadata Fields
+
+You can add additional fields beyond Gift Aid in `config/donation-checkout.php`:
+
+```php
+'custom_fields' => [
+    'message' => ['type' => 'text', 'label' => 'Leave a message'],
+    'newsletter' => ['type' => 'checkbox', 'label' => 'Subscribe to our newsletter'],
+],
+```
+
+Checkbox fields render as toggle switches. Text fields render as standard text inputs. All custom field values are passed to Stripe as session metadata.
+
+---
+
+## Donor Portal
+
+The donor portal gives donors a self-service view of their donation history without needing a password.
+
+### Magic Link Authentication
+
+Add the magic link form to your template:
+
+```antlers
+{{ donation:magic_link_form }}
+```
+
+This renders an email input form. When submitted, the donor receives an email with a time-limited signed link. Clicking the link logs them in and redirects to the portal at `/donation-checkout/portal`.
+
+When the donor is already logged in, the tag renders a "Manage your donations" link to the portal instead.
+
+You can customise the tag:
+
+```antlers
+{{ donation:magic_link_form button_text="Access my donations" heading="Returning donor?" portal_text="View your history" }}
+```
+
+### Portal Page
+
+The portal at `/donation-checkout/portal` shows:
+
+- Recurring donations with status (Active, Paused, Cancelled), amount, start date, and next payment date
+- Single donations with status (Succeeded, Refunded), amount, and date
+- Cancel button for active subscriptions (configurable via CP Settings)
+
+The portal view is publishable:
+
+```bash
+php artisan vendor:publish --tag=donation-checkout-views
+```
+
+### Antlers Tags for Custom Portals
+
+If you prefer to build your own portal template, use the `{{ donation:portal }}` tag pair:
+
+```antlers
+{{ donation:portal }}
+    {{ if authenticated }}
+        {{ subscriptions }}
+            <p>{{ currency | upper }} {{ amount }}/mo ({{ status }})</p>
+            {{ if can_cancel }}
+                <form method="POST" action="{{ cancel_url }}">
+                    {{ csrf_field }}
+                    <button type="submit">Cancel</button>
+                </form>
+            {{ /if }}
+        {{ /subscriptions }}
+
+        {{ donations }}
+            <p>{{ currency | upper }} {{ amount }} on {{ date }} ({{ status }})</p>
+        {{ /donations }}
+    {{ else }}
+        <p>Please log in to view your donations.</p>
+    {{ /if }}
+{{ /donation:portal }}
+```
+
+### Configuration
+
+The following portal settings can be changed from the CP under **Globals > Donation Checkout Messages > Settings**:
+
+- **Enable Donor Portal** (show/hide the magic link form)
+- **Donors Can Cancel** (allow donors to cancel their own subscriptions)
+
+The magic link expiry is configurable in `config/donation-checkout.php`:
+
+```php
+'magic_link_expiry_hours' => 24,
+```
+
+---
+
+## Stripe Webhooks
+
+Webhooks keep your site in sync when events happen outside your application (e.g. a subscription is cancelled from the Stripe Dashboard, or a payment fails).
+
+### Setup
+
+The easiest way to register the webhook endpoint in Stripe is with the artisan command:
+
+```bash
+php artisan donation-checkout:setup-webhook
+```
+
+This creates the webhook endpoint in Stripe via the API and writes the `STRIPE_WEBHOOK_SECRET` to your `.env` file automatically.
+
+For custom URLs (e.g. when using ngrok for local development):
+
+```bash
+php artisan donation-checkout:setup-webhook --url=https://your-tunnel.ngrok.io/donation-checkout/webhook/stripe
+```
+
+To update the events on an existing webhook:
+
+```bash
+php artisan donation-checkout:setup-webhook --update
+```
+
+### Events Handled
+
+| Stripe Event | What Happens |
+|---|---|
+| `checkout.session.completed` | Sends donation confirmation email, clears caches, dispatches `DonationCompleted` event |
+| `customer.subscription.updated` | Detects pause/resume, sends donor email, dispatches `SubscriptionPaused`/`SubscriptionResumed`/`SubscriptionUpdated` |
+| `customer.subscription.deleted` | Clears caches, dispatches `SubscriptionCancelled` |
+| `charge.refunded` | Clears caches, dispatches `DonationRefunded` |
+| `invoice.payment_failed` | Clears caches, dispatches `RecurringPaymentFailed` |
+| `invoice.payment_succeeded` | Clears caches, dispatches `RecurringPaymentSucceeded` |
+
+### Listening to Events
+
+All webhook events dispatch Laravel events that your application can listen to:
+
+```php
+// In a service provider or EventServiceProvider
+use Ghijk\DonationCheckout\Events\DonationCompleted;
+use Ghijk\DonationCheckout\Events\SubscriptionCancelled;
+use Ghijk\DonationCheckout\Events\RecurringPaymentFailed;
+
+Event::listen(DonationCompleted::class, function ($event) {
+    // $event->stripeCustomerId
+    // $event->sessionId
+    // $event->mode ('payment' or 'subscription')
+    // $event->amountInCents
+    // $event->currency
+});
+
+Event::listen(RecurringPaymentFailed::class, function ($event) {
+    // Send a dunning email, notify admin, etc.
+    // $event->stripeCustomerId
+    // $event->invoiceId
+    // $event->subscriptionId
+});
+```
+
+### Manual Setup
+
+If you prefer to configure the webhook manually in the Stripe Dashboard:
+
+1. Go to [Developers > Webhooks](https://dashboard.stripe.com/webhooks)
+2. Add endpoint: `https://yoursite.com/donation-checkout/webhook/stripe`
+3. Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `charge.refunded`, `invoice.payment_failed`, `invoice.payment_succeeded`
+4. Copy the signing secret and add to `.env`:
+
+```dotenv
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+---
+
+## Control Panel
+
+### Donations Dashboard
+
+Navigate to **Tools > Donations** in the CP to see all donations and subscriptions. The listing supports sorting by date, donor, type, amount, and status. Use the search bar to find specific donors.
+
+Click a donor's name to view their full profile with separate tables for recurring and single donations.
+
+### Actions
+
+From the donations listing or donor profile, you can:
+
+- **Pause** a recurring donation (invoices are voided while paused)
+- **Resume** a paused donation
+- **Cancel** a recurring donation (cannot be undone)
+- **Refund** a single donation (full refund, cannot be undone)
+
+All actions require confirmation and are permission-gated.
+
+### Permissions
+
+Configure under **Users > Roles**:
+
+- `view donations` allows seeing the donations listing and donor profiles
+- `cancel donations` allows pausing, resuming, and cancelling subscriptions
+- `refund donations` allows refunding single donations
+
+### Dashboard Widget
+
+Add the Donation Stats widget to your dashboard via **CP > Dashboard**. It shows total raised, active subscription count, and the 5 most recent donations. Data is cached for 5 minutes by default.
+
+### Donor Emails
+
+Donors receive styled HTML emails at key moments in the donation lifecycle:
+
+| Email | Trigger |
+|---|---|
+| **Donation Confirmation** | Single donation completed via Stripe Checkout |
+| **Recurring Confirmation** | Monthly donation set up via Stripe Checkout |
+| **Subscription Paused** | Recurring donation paused from CP or Stripe Dashboard |
+| **Subscription Resumed** | Paused donation resumed |
+| **Magic Link** | Donor requests portal access |
+
+#### Email Branding
+
+Configure the email appearance from **CP > Globals > Donation Checkout Emails > Branding**:
+
+- **Logo**: upload via the asset picker (recommended: 200px wide, PNG or SVG)
+- **Organisation Name**: shown in the header when no logo is set, and in the sign-off
+- **Accent Colour**: used for the header band, buttons, and amount highlight boxes
+- **Greeting**: the opening line of every email, with placeholder support (`{first_name}`, `{last_name}`, `{name}`, `{email}`). Defaults to "Hi {first_name},"
+
+#### Email Content
+
+Each email type has its own tab in the Donation Checkout Emails global with customisable **subject line**, **heading**, and **body text**:
+
+- **Donation Confirmation** tab (single donations)
+- **Recurring Confirmation** tab (monthly donations)
+- **Subscription Paused** tab
+- **Subscription Resumed** tab
+
+The subject line controls what appears in the inbox. The heading is the bold title inside the email. The body is the main paragraph text.
+
+#### Publishing Email Templates
+
+The compiled email views are publishable for full markup control:
+
+```bash
+php artisan vendor:publish --tag=donation-checkout-views
+```
+
+Templates in `resources/views/vendor/donation-checkout/emails/`:
+
+- `donation-single.blade.php`
+- `donation-recurring.blade.php`
+- `subscription-paused.blade.php`
+- `subscription-resumed.blade.php`
+- `magic-link.blade.php`
+
+#### Developing Email Templates
+
+Email source templates live in the `emails/` directory and use the [Maizzle](https://maizzle.com) framework with Tailwind CSS. To modify the email design:
+
+```bash
+cd emails
+npm install
+npm run dev     # preview with hot reload
+npm run build   # compile to resources/views/emails/
+```
+
+The production build inlines all CSS, adds Outlook compatibility, and outputs `.blade.php` files with Blade variables preserved. Only the compiled output is used at runtime.

@@ -1,0 +1,31 @@
+---
+preheader: Thank you for your recurring donation
+---
+
+<x-main>
+  <h1 class="m-0 mb-2 text-3xl/9 text-slate-900 font-extrabold tracking-tight">
+    {{ $heading }}
+  </h1>
+
+  <div class="h-4"></div>
+
+  <p class="m-0 mb-4 text-base/7 text-slate-600">
+    {{ $greeting }}
+  </p>
+
+  <p class="m-0 mb-6 text-base/7 text-slate-600">
+    {{ $body }}
+  </p>
+
+  <!-- Amount highlight -->
+  <table class="w-full rounded-xl" role="presentation" style="background-color: {{ $accentColor }}10;">
+    <tr>
+      <td class="px-6 py-5 text-center">
+        <p class="m-0 text-sm font-semibold uppercase tracking-wider text-slate-500">Monthly donation</p>
+        <p class="m-0 mt-1 text-3xl font-extrabold" style="color: {{ $accentColor }};">{{ strtoupper($currency) }} {{ number_format($amount, 2) }}<span class="text-lg font-bold text-slate-400">/mo</span></p>
+      </td>
+    </tr>
+  </table>
+
+  <div class="h-8"></div>
+</x-main>
