@@ -143,3 +143,35 @@ tabs:
               display: Body
               instructions: 'The main message sent when a subscription is resumed.'
               default: 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.'
+      -
+        display: Single Donation Confirmation
+        fields:
+          -
+            handle: single_email_heading
+            field:
+              type: text
+              display: Heading
+              default: 'Thank You for Your Donation'
+          -
+            handle: single_email_body
+            field:
+              type: textarea
+              display: Body
+              instructions: 'The main message sent after a single donation is completed.'
+              default: 'Thank you for your generous donation. Your contribution makes a real difference and we are truly grateful for your support.'
+      -
+        display: Recurring Donation Confirmation
+        fields:
+          -
+            handle: recurring_email_heading
+            field:
+              type: text
+              display: Heading
+              default: 'Thank You for Your Monthly Donation'
+          -
+            handle: recurring_email_body
+            field:
+              type: textarea
+              display: Body
+              instructions: 'The main message sent after a recurring donation is set up.'
+              default: 'Thank you for setting up a recurring donation. Your ongoing support helps us plan for the future and makes a lasting difference.'
