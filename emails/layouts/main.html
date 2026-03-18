@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+  <meta charset="utf-8">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings xmlns:o="urn:schemas-microsoft-com:office:office">
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <style>
+    td,th,div,p,a,h1,h2,h3,h4,h5,h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
+  </style>
+  <![endif]-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" media="screen">
+  <style>
+    @tailwind components;
+    @tailwind utilities;
+
+    img {
+      @apply max-w-full align-middle;
+    }
+  </style>
+</head>
+<body class="m-0 p-0 w-full [word-break:break-word] [-webkit-font-smoothing:antialiased] bg-slate-100">
+  <div role="article" aria-roledescription="email" lang="en">
+    <div class="bg-slate-100 font-inter sm:px-4">
+      <table align="center" class="m-0 mx-auto">
+        <tr>
+          <td class="w-[552px] max-w-full">
+            <div class="h-8"></div>
+
+            <table class="w-full">
+              <tr>
+                <td class="py-8 px-10 sm:p-6 bg-white [border:1px_solid_theme(colors.slate.200)] rounded-lg">
+                  <yield />
+                </td>
+              </tr>
+            </table>
+
+            <table class="w-full">
+              <tr>
+                <td class="py-6 px-10 sm:px-6 text-center">
+                  <p class="m-0 text-xs text-slate-400">
+                    You received this email because you made a donation. If you believe this was sent in error, please disregard it.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

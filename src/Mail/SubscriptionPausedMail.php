@@ -7,19 +7,27 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
+use Ghijk\DonationCheckout\Support\Settings;
 
 class SubscriptionPausedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public readonly string $heading;
+
+    public readonly string $body;
+
     public function __construct(
         public readonly string $donorName
-    ) {}
+    ) {
+        $this->heading = Settings::pausedEmailHeading();
+        $this->body = Settings::pausedEmailBody();
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Thank You for Your Support',
+            subject: $this->heading,
         );
     }
 

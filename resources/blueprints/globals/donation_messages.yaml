@@ -108,3 +108,38 @@ tabs:
               type: text
               display: Button URL
               default: '/'
+  emails:
+    display: Emails
+    sections:
+      -
+        display: Subscription Paused
+        fields:
+          -
+            handle: paused_email_heading
+            field:
+              type: text
+              display: Heading
+              default: 'Thank You for Your Support'
+          -
+            handle: paused_email_body
+            field:
+              type: textarea
+              display: Body
+              instructions: 'The main message sent when a subscription is paused.'
+              default: 'We wanted to reach out to let you know that your recurring donation has been paused. Thank you so much for the support you have given us. Your generosity has made a real difference, and we are truly grateful for every contribution. If you ever wish to resume your donation, you are welcome to do so at any time.'
+      -
+        display: Subscription Resumed
+        fields:
+          -
+            handle: resumed_email_heading
+            field:
+              type: text
+              display: Heading
+              default: 'Your Donation Has Been Resumed'
+          -
+            handle: resumed_email_body
+            field:
+              type: textarea
+              display: Body
+              instructions: 'The main message sent when a subscription is resumed.'
+              default: 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.'
