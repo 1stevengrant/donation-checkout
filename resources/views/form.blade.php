@@ -62,6 +62,33 @@
                required>
     </div>
 
+    @if(!empty($custom_fields))
+        <div class="donation-custom-fields">
+            @foreach($custom_fields as $field => $config)
+                <div class="donation-field">
+                    @if(($config['type'] ?? 'text') === 'checkbox')
+                        <label class="donation-toggle" for="donation-{{ $field }}">
+                            <input type="checkbox"
+                                   name="{{ $field }}"
+                                   id="donation-{{ $field }}"
+                                   value="1"
+                                   class="donation-toggle-input">
+                            <span class="donation-toggle-track">
+                                <span class="donation-toggle-thumb"></span>
+                            </span>
+                            <span class="donation-toggle-label">{{ $config['label'] ?? $field }}</span>
+                        </label>
+                    @else
+                        <label for="donation-{{ $field }}">{{ $config['label'] ?? $field }}</label>
+                        <input type="text"
+                               name="{{ $field }}"
+                               id="donation-{{ $field }}">
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
     <div class="donation-submit">
         <button type="submit" id="donation-submit-btn" class="donation-submit-btn">
             {{ $button_text }}

@@ -12,6 +12,11 @@ class UserService
         return User::findByEmail($email);
     }
 
+    public function findByStripeCustomerId(string $customerId): mixed
+    {
+        return User::all()->first(fn ($user) => $user->get('stripe_customer_id') === $customerId);
+    }
+
     public function createUser(
         string $firstName,
         string $lastName,
