@@ -115,13 +115,13 @@ tabs:
         display: Branding
         fields:
           -
-            handle: email_logo_url
+            handle: email_logo
             field:
-              type: text
-              display: 'Logo URL'
-              instructions: 'Full URL to your logo image for emails (recommended: 200px wide, PNG or SVG).'
-              input_type: url
-              placeholder: 'https://example.com/logo.png'
+              type: assets
+              display: Logo
+              instructions: 'Logo image for emails (recommended: 200px wide, PNG or SVG).'
+              max_files: 1
+              container: assets
           -
             handle: email_org_name
             field:
