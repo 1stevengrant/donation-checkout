@@ -86,7 +86,7 @@
                         <p style="margin: 0px; font-size: 1rem; line-height: 1.5rem; color: rgb(100, 116, 139);">
                           With gratitude,
                           <br>
-                          <span style="font-weight: 700; color: rgb(51, 65, 85);">{{ $orgName ?: &#039;The Team&#039; }}</span>
+                          <span style="font-weight: 700; color: rgb(51, 65, 85);">{{ $orgName }}</span>
                         </p>
                       </td>
                     </tr>
