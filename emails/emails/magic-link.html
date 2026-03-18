@@ -1,0 +1,33 @@
+---
+preheader: Access your donor portal
+---
+
+<x-main>
+  <h1 class="m-0 mb-6 text-2xl/8 text-slate-900 font-semibold">
+    Your Donor Portal Link
+  </h1>
+
+  <p class="m-0 mb-6 text-base/6 text-slate-600">
+    You requested a link to view your donations. Click the button below to access your donor portal.
+  </p>
+
+  <table class="w-full" role="presentation">
+    <tr>
+      <td>
+        <a href="{{ $url }}" class="inline-block rounded-lg bg-indigo-600 px-6 py-3 text-center text-sm font-semibold text-white no-underline hover:bg-indigo-700">
+          Access Your Portal
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  <div class="h-6"></div>
+
+  <p class="m-0 mb-4 text-base/6 text-slate-600">
+    This link will expire in @{{ config('donation-checkout.magic_link_expiry_hours', 24) }} hours.
+  </p>
+
+  <p class="m-0 text-sm/5 text-slate-500">
+    If you did not request this link, you can safely ignore this email.
+  </p>
+</x-main>

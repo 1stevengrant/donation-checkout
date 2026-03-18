@@ -67,4 +67,24 @@ class Settings
 
         return $fields;
     }
+
+    public static function pausedEmailHeading(): string
+    {
+        return (string) static::get('paused_email_heading', 'Thank You for Your Support');
+    }
+
+    public static function pausedEmailBody(): string
+    {
+        return (string) static::get('paused_email_body', 'We wanted to reach out to let you know that your recurring donation has been paused. Thank you so much for the support you have given us. Your generosity has made a real difference, and we are truly grateful for every contribution. If you ever wish to resume your donation, you are welcome to do so at any time.');
+    }
+
+    public static function resumedEmailHeading(): string
+    {
+        return (string) static::get('resumed_email_heading', 'Your Donation Has Been Resumed');
+    }
+
+    public static function resumedEmailBody(): string
+    {
+        return (string) static::get('resumed_email_body', 'Great news! Your recurring donation has been resumed and payments will continue as normal. Thank you for your continued generosity. Your ongoing support makes a real difference.');
+    }
 }
