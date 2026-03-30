@@ -31,6 +31,12 @@ class DonationRequest extends FormRequest
 
             if ($type === 'checkbox') {
                 $fieldRules[] = 'boolean';
+            } elseif ($type === 'select') {
+                $fieldRules[] = 'string';
+                $options = $config['options'] ?? [];
+                if ($options) {
+                    $fieldRules[] = 'in:' . implode(',', $options);
+                }
             } else {
                 $fieldRules[] = 'string';
                 $fieldRules[] = 'max:500';

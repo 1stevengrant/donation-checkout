@@ -65,11 +65,24 @@ class Settings
         return (bool) static::get('donor_can_cancel', config('donation-checkout.donor_can_cancel_subscriptions', true));
     }
 
+    public static function titleEnabled(): bool
+    {
+        return static::giftAidEnabled();
+    }
+
     public static function customFields(): array
     {
         $fields = config('donation-checkout.custom_fields', []);
 
         if (static::giftAidEnabled()) {
+            $fields = array_merge([
+                'title' => [
+                    'type' => 'select',
+                    'label' => 'Title',
+                    'options' => ['Mr', 'Mrs', 'Ms', 'Miss', 'Mx', 'Dr', 'Rev', 'Prof'],
+                ],
+            ], $fields);
+
             $fields['gift_aid'] = [
                 'type' => 'checkbox',
                 'label' => static::giftAidLabel(),
