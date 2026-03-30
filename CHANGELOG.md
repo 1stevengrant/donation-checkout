@@ -2,6 +2,13 @@
 
 All notable changes to `donation-checkout` will be documented in this file.
 
+## Release 2.1.1 - 2026-03-30
+
+### Fixed
+
+- Updated `statamic/cms` (6.7.0 to 6.8.0) to resolve 8 security vulnerabilities including a critical account takeover via password reset link injection (CVE-2026-27593) and remote code execution via Antlers inputs (CVE-2026-28425).
+- Updated `league/commonmark` (2.8.1 to 2.8.2) to resolve embed extension allowed_domains bypass (CVE-2026-33347).
+
 ## 2.1.1 - 2026-03-31
 
 ### Fixed
