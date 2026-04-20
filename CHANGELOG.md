@@ -2,6 +2,14 @@
 
 All notable changes to `donation-checkout` will be documented in this file.
 
+## 2.1.2 - 2026-04-21
+
+### Fixed
+
+- Updated `statamic/cms` (6.8.0 to 6.14.0) to resolve unsafe method invocation via query value resolution allowing data destruction (GHSA-4jjr-vmv7-wh4w).
+- Updated `rhukster/dom-sanitizer` (1.0.8 to 1.0.10) to resolve SVG style tag CSS injection via unfiltered url() and @import directives (CVE-2026-40301).
+- Updated `webonyx/graphql-php` to resolve denial of service via quadratic complexity in OverlappingFieldsCanBeMerged validation (CVE-2026-40476).
+
 ## Release 2.1.1 - 2026-03-30
 
 ### Fixed
