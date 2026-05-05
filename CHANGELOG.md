@@ -2,6 +2,12 @@
 
 All notable changes to `donation-checkout` will be documented in this file.
 
+## v2.1.3 - 2026-05-06
+
+### Fixed
+
+- Updated `webonyx/graphql-php` (15.32.0 to 15.32.3) to resolve unbounded recursion in parser causing stack overflow on crafted nested input ([GHSA-r7cg-qjjm-xhqq](https://github.com/advisories/GHSA-r7cg-qjjm-xhqq)) and quadratic validation cost in `OverlappingFieldsCanBeMerged` via inline fragments ([GHSA-fc86-6rv6-2jpm](https://github.com/advisories/GHSA-fc86-6rv6-2jpm)).
+
 ## v2.1.2 - 2026-04-20
 
 ### Fixed

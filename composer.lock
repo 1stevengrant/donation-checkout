@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d1321ada211ce352812f13b09c16cb7e",
+    "content-hash": "2a804e747264d6872434da565fea0b60",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -9128,16 +9128,16 @@
         },
         {
             "name": "webonyx/graphql-php",
-            "version": "v15.32.0",
+            "version": "v15.32.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webonyx/graphql-php.git",
-                "reference": "e7ff849803e471c93edf9396ccde549bf8002373"
+                "reference": "993bf0bea17f870412ad8a90f60c41cb8d5f1145"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/e7ff849803e471c93edf9396ccde549bf8002373",
-                "reference": "e7ff849803e471c93edf9396ccde549bf8002373",
+                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/993bf0bea17f870412ad8a90f60c41cb8d5f1145",
+                "reference": "993bf0bea17f870412ad8a90f60c41cb8d5f1145",
                 "shasum": ""
             },
             "require": {
@@ -9155,7 +9155,7 @@
                 "nyholm/psr7": "^1.5",
                 "phpbench/phpbench": "^1.2",
                 "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "2.1.46",
+                "phpstan/phpstan": "2.1.51",
                 "phpstan/phpstan-phpunit": "2.0.16",
                 "phpstan/phpstan-strict-rules": "2.0.10",
                 "phpunit/phpunit": "^9.5 || ^10.5.21 || ^11",
@@ -9192,7 +9192,7 @@
             ],
             "support": {
                 "issues": "https://github.com/webonyx/graphql-php/issues",
-                "source": "https://github.com/webonyx/graphql-php/tree/v15.32.0"
+                "source": "https://github.com/webonyx/graphql-php/tree/v15.32.3"
             },
             "funding": [
                 {
@@ -9204,7 +9204,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-04-20T16:19:33+00:00"
+            "time": "2026-04-24T13:49:35+00:00"
         },
         {
             "name": "wilderborn/partyline",
