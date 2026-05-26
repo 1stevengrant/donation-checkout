@@ -2,6 +2,16 @@
 
 All notable changes to `donation-checkout` will be documented in this file.
 
+## v2.1.4 - 2026-05-27
+
+### Fixed
+
+- Updated `statamic/cms` (6.14.0 to 6.20.0) to resolve server-side request forgery via Glide ([CVE-2026-45660](https://github.com/advisories/GHSA-pf9c-ch8r-2958)) and email enumeration via forgot password endpoint ([CVE-2026-44306](https://github.com/advisories/GHSA-m24v-f7g5-gq67)).
+- Updated `symfony/http-kernel` (7.4.8 to 7.4.12) to resolve HEAD request bypass on `#[IsGranted]` / `#[IsSignatureValid]` / `#[IsCsrfTokenValid]` method filters ([CVE-2026-45075](https://symfony.com/cve-2026-45075)).
+- Updated `symfony/mailer` (7.4.8 to 7.4.12) to resolve argument injection in SendmailTransport via dash-prefixed recipient address ([CVE-2026-45068](https://symfony.com/cve-2026-45068)).
+- Updated `symfony/mime` (7.4.8 to 7.4.12) to resolve header injection via non-printable characters ([CVE-2026-45069](https://symfony.com/cve-2026-45069)).
+- Updated `symfony/yaml` (7.4.8 to 7.4.12) to resolve exponential memory allocation via recursive alias expansion ([CVE-2026-45304](https://symfony.com/cve-2026-45304)), ReDoS via catastrophic backtracking in `Parser::cleanup()` ([CVE-2026-45305](https://symfony.com/cve-2026-45305)), and stack exhaustion via unbounded recursion ([CVE-2026-45133](https://symfony.com/cve-2026-45133)).
+
 ## v2.1.3 - 2026-05-06
 
 ### Fixed
