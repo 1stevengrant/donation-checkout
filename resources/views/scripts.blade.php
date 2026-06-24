@@ -55,6 +55,18 @@
             email: document.getElementById('donation-email').value
         };
 
+        @if(!empty($custom_fields))
+        @foreach($custom_fields as $field => $config)
+        @if(($config['type'] ?? 'text') === 'checkbox')
+        data['{{ $field }}'] = document.getElementById('donation-{{ $field }}') ? document.getElementById('donation-{{ $field }}').checked : false;
+        @elseif(($config['type'] ?? 'text') === 'select')
+        data['{{ $field }}'] = document.getElementById('donation-{{ $field }}') ? document.getElementById('donation-{{ $field }}').value : '';
+        @else
+        data['{{ $field }}'] = document.getElementById('donation-{{ $field }}') ? document.getElementById('donation-{{ $field }}').value : '';
+        @endif
+        @endforeach
+        @endif
+
         fetch('/donation-checkout/start', {
             method: 'POST',
             headers: {
