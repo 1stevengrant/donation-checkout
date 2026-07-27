@@ -37,7 +37,18 @@
                required>
     </label>
 
-    <div class="donation-fields">
+    <div class="donation-fields{{ !empty($custom_fields['title']) ? ' donation-fields-with-title' : '' }}">
+        @if(!empty($custom_fields['title']))
+            <div class="donation-field donation-field-title">
+                <label for="donation-title">{{ $custom_fields['title']['label'] ?? 'Title' }}</label>
+                <select name="title" id="donation-title">
+                    <option value="">Select...</option>
+                    @foreach($custom_fields['title']['options'] ?? [] as $option)
+                        <option value="{{ $option }}">{{ $option }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
         <div class="donation-field">
             <label for="donation-first-name">First Name</label>
             <input type="text"
@@ -61,6 +72,44 @@
                id="donation-email"
                required>
     </div>
+
+    @if(!empty($custom_fields))
+        <div class="donation-custom-fields">
+            @foreach($custom_fields as $field => $config)
+                @if($field === 'title')
+                    @continue
+                @endif
+                <div class="donation-field">
+                    @if(($config['type'] ?? 'text') === 'select')
+                        <label for="donation-{{ $field }}">{{ $config['label'] ?? $field }}</label>
+                        <select name="{{ $field }}" id="donation-{{ $field }}">
+                            <option value="">Select...</option>
+                            @foreach($config['options'] ?? [] as $option)
+                                <option value="{{ $option }}">{{ $option }}</option>
+                            @endforeach
+                        </select>
+                    @elseif(($config['type'] ?? 'text') === 'checkbox')
+                        <label class="donation-toggle" for="donation-{{ $field }}">
+                            <input type="checkbox"
+                                   name="{{ $field }}"
+                                   id="donation-{{ $field }}"
+                                   value="1"
+                                   class="donation-toggle-input">
+                            <span class="donation-toggle-track">
+                                <span class="donation-toggle-thumb"></span>
+                            </span>
+                            <span class="donation-toggle-label">{{ $config['label'] ?? $field }}</span>
+                        </label>
+                    @else
+                        <label for="donation-{{ $field }}">{{ $config['label'] ?? $field }}</label>
+                        <input type="text"
+                               name="{{ $field }}"
+                               id="donation-{{ $field }}">
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     <div class="donation-submit">
         <button type="submit" id="donation-submit-btn" class="donation-submit-btn">

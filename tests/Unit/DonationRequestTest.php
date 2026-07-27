@@ -108,3 +108,42 @@ it('accepts single frequency', function () {
 it('accepts recurring frequency', function () {
     expect(validateDonation(validDonationData(['frequency' => 'recurring']))->passes())->toBeTrue();
 });
+
+it('validates select field accepts valid option', function () {
+    config()->set('donation-checkout.custom_fields', [
+        'title' => [
+            'type' => 'select',
+            'label' => 'Title',
+            'options' => ['Mr', 'Mrs', 'Ms'],
+        ],
+    ]);
+
+    expect(validateDonation(validDonationData(['title' => 'Mr']))->passes())->toBeTrue();
+});
+
+it('validates select field rejects invalid option', function () {
+    config()->set('donation-checkout.custom_fields', [
+        'title' => [
+            'type' => 'select',
+            'label' => 'Title',
+            'options' => ['Mr', 'Mrs', 'Ms'],
+        ],
+    ]);
+
+    $validator = validateDonation(validDonationData(['title' => 'King']));
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->has('title'))->toBeTrue();
+});
+
+it('validates select field allows nullable', function () {
+    config()->set('donation-checkout.custom_fields', [
+        'title' => [
+            'type' => 'select',
+            'label' => 'Title',
+            'options' => ['Mr', 'Mrs', 'Ms'],
+        ],
+    ]);
+
+    expect(validateDonation(validDonationData(['title' => null]))->passes())->toBeTrue();
+});

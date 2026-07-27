@@ -1,0 +1,10 @@
+title: Donation Checkout Messages
+data:
+  single_heading: 'Thank you for your donation!'
+  single_message: 'Your generous contribution makes a real difference.'
+  single_cta_text: 'Return home'
+  single_cta_url: '/'
+  recurring_heading: 'Thank you for your monthly donation!'
+  recurring_message: 'Your ongoing support helps us plan for the future.'
+  recurring_cta_text: 'Return home'
+  recurring_cta_url: '/'
