@@ -23,9 +23,31 @@ jobs:
           latest-version: ${{ github.event.release.name }}
           release-notes: ${{ github.event.release.body }}
 
+      # main requires verified signatures, so the commit is created through the
+      # GraphQL API. Commits made that way are signed with GitHub's own key.
       - name: Commit updated CHANGELOG
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
-        with:
-          branch: main
-          commit_message: Update CHANGELOG
-          file_pattern: CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "CHANGELOG.md unchanged, nothing to commit."
+            exit 0
+          fi
+
+          gh api graphql \
+            -f query='
+              mutation($repo: String!, $branch: String!, $oid: GitObjectID!, $path: String!, $contents: Base64String!) {
+                createCommitOnBranch(input: {
+                  branch: { repositoryNameWithOwner: $repo, branchName: $branch }
+                  expectedHeadOid: $oid
+                  message: { headline: "Update CHANGELOG" }
+                  fileChanges: { additions: [{ path: $path, contents: $contents }] }
+                }) {
+                  commit { oid }
+                }
+              }' \
+            -f repo="${GITHUB_REPOSITORY}" \
+            -f branch=main \
+            -f oid="$(git rev-parse HEAD)" \
+            -f path=CHANGELOG.md \
+            -f contents="$(base64 -w0 CHANGELOG.md)"

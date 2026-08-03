@@ -2,6 +2,12 @@
 
 All notable changes to `donation-checkout` will be documented in this file.
 
+## v2.1.5 - 2026-08-04
+
+### Fixed
+
+- Updated `guzzlehttp/guzzle` (7.13.1 to 7.15.2), along with `guzzlehttp/promises` (2.5.0 to 2.5.1) and `guzzlehttp/psr7` (2.12.3 to 2.13.0), to resolve noncanonical host bypassing host-based checks ([CVE-2026-69246](https://github.com/advisories/GHSA-v5mv-p594-2x33)), noncanonical cookie domain retaining subdomain scope ([CVE-2026-69245](https://github.com/advisories/GHSA-f7vp-7xgx-4w4r)), URI fragments disclosed in redirect `Referer` headers ([GHSA-h95v-h523-3mw8](https://github.com/advisories/GHSA-h95v-h523-3mw8)), host-only cookie scope not being preserved ([GHSA-wm3w-8rrp-j577](https://github.com/advisories/GHSA-wm3w-8rrp-j577)), unbounded response cookies risking denial of service ([GHSA-f283-ghqc-fg79](https://github.com/advisories/GHSA-f283-ghqc-fg79)), and `Proxy-Authorization` headers being sent to origin servers ([GHSA-94pj-82f3-465w](https://github.com/advisories/GHSA-94pj-82f3-465w)).
+
 ## v2.1.4 - 2026-05-27
 
 ### Fixed
