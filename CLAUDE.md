@@ -41,13 +41,16 @@ Form tag parameters: `amounts`, `default`, `frequency`, `currency_symbol`, `butt
 
 ### Request Flow
 1. POST to `/donation-checkout/start` hits `StartDonationController` (invokable)
-2. `DonationRequest` validates: amount, email, first_name, last_name, frequency (single|recurring)
-3. `UserService` finds or creates Statamic user by email
-4. `PaymentService` creates Stripe customer if needed, then creates appropriate Checkout Session
-5. Returns Stripe Checkout Session (frontend redirects to `session.url`)
+2. `DonationRequest` normalises input (trims, lowercases email) and validates: amount, email, first_name, last_name, frequency (single|recurring)
+3. When `create_users` is enabled, `UserService` finds or creates a Statamic user by email
+4. `CreateStripeCustomer` reuses the Stripe customer matching the email, or creates one
+5. `CreateSingleDonation` / `CreateRecurringDonation` creates the Checkout Session
+6. Returns `{"url": ...}` (frontend redirects there), or a generic 502 if Stripe errors
 
-### Services
-- `PaymentService` - Stripe API wrapper: customer CRUD, single donations (payment mode), recurring donations (subscription mode using price plan multiplier)
+### Actions & Services
+- `CreateStripeCustomer` - finds an existing Stripe customer by email, otherwise creates one
+- `CreateSingleDonation` - payment-mode Checkout Session, amount converted to minor units
+- `CreateRecurringDonation` - subscription-mode Checkout Session using the price plan as a quantity multiplier
 - `UserService` - Statamic User facade wrapper: find by email, create with random password, update with stripe_customer_id
 
 ### Configuration
@@ -56,13 +59,17 @@ Published to `config/donation-checkout.php`:
 - `stripe_price_plan_id` - Required for recurring donations (create £1/month product in Stripe, use price ID)
 - Success/cancel URLs for both donation types
 - Currency (default: gbp)
+- `create_users` - whether anonymous donors get a Statamic user record (default true)
+- `rate_limit_per_minute` / `rate_limit_per_day` - per-IP limits on the donation endpoint
 
 ### Route
-Single route: `POST /donation-checkout/start` - CSRF disabled for API usage
+Single route: `POST /donation-checkout/start`, in the `web` group so CSRF applies. Rate limited via
+the named `donation-checkout` limiter registered in `ServiceProvider::registerRateLimiter()`.
 
 ## Key Implementation Details
 
 - Recurring donations use quantity-based pricing: amount becomes quantity × £1 price plan
 - Users are created with random 16-char passwords (donation flow doesn't require login)
 - `stripe_customer_id` stored on Statamic user for reuse
-- Uses `ray()` debugging calls throughout (Spatie Ray)
+- The endpoint is public and unauthenticated; treat all input as hostile and keep Stripe error
+  detail server-side (logged) rather than in the response body

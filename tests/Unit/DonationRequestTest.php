@@ -108,3 +108,25 @@ it('accepts single frequency', function () {
 it('accepts recurring frequency', function () {
     expect(validateDonation(validDonationData(['frequency' => 'recurring']))->passes())->toBeTrue();
 });
+
+it('rejects emails longer than 254 characters', function () {
+    $email = str_repeat('a', 250) . '@example.com';
+    $validator = validateDonation(validDonationData(['email' => $email]));
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->has('email'))->toBeTrue();
+});
+
+it('rejects names longer than 100 characters', function () {
+    $validator = validateDonation(validDonationData(['first_name' => str_repeat('a', 101)]));
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->has('first_name'))->toBeTrue();
+});
+
+it('rejects names containing control characters', function () {
+    $validator = validateDonation(validDonationData(['last_name' => "Doe\nBcc: attacker@example.com"]));
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->has('last_name'))->toBeTrue();
+});

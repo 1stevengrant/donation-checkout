@@ -23,6 +23,9 @@ abstract class TestCase extends OrchestraTestCase
             'recurring_donation_success_message' => 'Thank you!',
             'default_amount' => 10,
             'default_frequency' => 'recurring',
+            'create_users' => true,
+            'rate_limit_per_minute' => 5,
+            'rate_limit_per_day' => 50,
         ]);
     }
 

@@ -4,7 +4,10 @@ namespace Ghijk\DonationCheckout;
 
 use Statamic\Statamic;
 use Stripe\StripeClient;
+use Illuminate\Http\Request;
+use Illuminate\Cache\RateLimiting\Limit;
 use Ghijk\DonationCheckout\Tags\Donation;
+use Illuminate\Support\Facades\RateLimiter;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
@@ -40,6 +43,8 @@ class ServiceProvider extends AddonServiceProvider
             $command->call('vendor:publish', ['--tag' => 'donation-checkout-config']);
         });
 
+        $this->registerRateLimiter();
+
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'donation-checkout');
 
         $this->publishes([
@@ -49,5 +54,15 @@ class ServiceProvider extends AddonServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/donation-checkout'),
         ], 'donation-checkout-views');
+    }
+
+    private function registerRateLimiter(): void
+    {
+        RateLimiter::for('donation-checkout', fn (Request $request): array => [
+            Limit::perMinute((int) config('donation-checkout.rate_limit_per_minute', 5))
+                ->by($request->ip()),
+            Limit::perDay((int) config('donation-checkout.rate_limit_per_day', 50))
+                ->by($request->ip()),
+        ]);
     }
 }

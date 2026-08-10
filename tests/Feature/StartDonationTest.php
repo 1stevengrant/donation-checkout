@@ -2,6 +2,7 @@
 
 use Stripe\Customer;
 use Stripe\Checkout\Session;
+use Stripe\Exception\InvalidRequestException;
 use Ghijk\DonationCheckout\Services\UserService;
 use Ghijk\DonationCheckout\Actions\CreateSingleDonation;
 use Ghijk\DonationCheckout\Actions\CreateStripeCustomer;
@@ -210,4 +211,83 @@ it('handles recurring frequency donations', function () {
     $this->postJson('/donation-checkout/start', donationPayload(['frequency' => 'recurring']))
         ->assertOk()
         ->assertJson(['url' => 'https://checkout.stripe.com/recurring']);
+});
+
+it('normalises the email to lowercase before looking up the donor', function () {
+    $mockUser = new class
+    {
+        public string $stripe_customer_id = 'cus_123';
+    };
+
+    $session = Session::constructFrom(['url' => 'https://checkout.stripe.com/normalised']);
+
+    $this->mock(UserService::class, function ($mock) use ($mockUser) {
+        $mock->shouldReceive('findByEmail')
+            ->with('john@example.com')
+            ->once()
+            ->andReturn($mockUser);
+    });
+
+    $this->mock(CreateSingleDonation::class, function ($mock) use ($session) {
+        $mock->shouldReceive('__invoke')->once()->andReturn($session);
+    });
+
+    $this->postJson('/donation-checkout/start', donationPayload(['email' => '  John@Example.COM ']))
+        ->assertOk();
+});
+
+it('does not create statamic users when create_users is disabled', function () {
+    config()->set('donation-checkout.create_users', false);
+
+    $customer = Customer::constructFrom(['id' => 'cus_no_user']);
+    $session = Session::constructFrom(['url' => 'https://checkout.stripe.com/no_user']);
+
+    $this->mock(UserService::class, function ($mock) {
+        $mock->shouldNotReceive('findByEmail');
+        $mock->shouldNotReceive('createUser');
+        $mock->shouldNotReceive('updateUser');
+    });
+
+    $this->mock(CreateStripeCustomer::class, function ($mock) use ($customer) {
+        $mock->shouldReceive('__invoke')
+            ->with('john@example.com', 'John Doe')
+            ->once()
+            ->andReturn($customer);
+    });
+
+    $this->mock(CreateSingleDonation::class, function ($mock) use ($session) {
+        $mock->shouldReceive('__invoke')->once()->andReturn($session);
+    });
+
+    $this->postJson('/donation-checkout/start', donationPayload())
+        ->assertOk()
+        ->assertJson(['url' => 'https://checkout.stripe.com/no_user']);
+});
+
+it('does not leak stripe error details to the client', function () {
+    $mockUser = new class
+    {
+        public string $stripe_customer_id = 'cus_123';
+    };
+
+    $this->mock(UserService::class, function ($mock) use ($mockUser) {
+        $mock->shouldReceive('findByEmail')->andReturn($mockUser);
+    });
+
+    $this->mock(CreateSingleDonation::class, function ($mock) {
+        $mock->shouldReceive('__invoke')
+            ->once()
+            ->andThrow(new InvalidRequestException('No such price: price_test_123'));
+    });
+
+    $response = $this->postJson('/donation-checkout/start', donationPayload())
+        ->assertStatus(502);
+
+    expect($response->json('message'))->not->toContain('price_test_123');
+});
+
+it('rejects overlong names', function () {
+    $this->postJson('/donation-checkout/start', donationPayload(['first_name' => str_repeat('a', 101)]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['first_name']);
 });
