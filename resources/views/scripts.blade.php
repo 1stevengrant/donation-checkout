@@ -7,7 +7,7 @@
     const submitBtn = document.getElementById('donation-submit-btn');
     const errorMessage = document.getElementById('donation-error');
     const submitBtnText = submitBtn.textContent;
-    let frequency = '{{ $frequency ?? config('donation-checkout.default_frequency', 'recurring') }}';
+    let frequency = @js($frequency ?? config('donation-checkout.default_frequency', 'recurring'));
 
     // Frequency toggle
     document.querySelectorAll('.donation-frequency-btn').forEach(btn => {
@@ -43,6 +43,14 @@
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+
+        if (!csrfToken) {
+            errorMessage.textContent = 'This page is missing its CSRF token. Please reload and try again.';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
         errorMessage.style.display = 'none';
@@ -60,7 +68,7 @@
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': csrfToken.content
             },
             body: JSON.stringify(data)
         })

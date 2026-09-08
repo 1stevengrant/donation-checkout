@@ -22,7 +22,7 @@ class Donation extends Tags
         return view('donation-checkout::form', [
             'amounts' => $amounts,
             'default' => (int) $this->params->get('default', 10),
-            'frequency' => $this->params->get('frequency', 'recurring'),
+            'frequency' => $this->frequency(),
             'currency_symbol' => $this->params->get('currency_symbol', '£'),
             'button_text' => $this->params->get('button_text', 'Donate'),
         ])->render();
@@ -42,8 +42,18 @@ class Donation extends Tags
     public function scripts(): string
     {
         return view('donation-checkout::scripts', [
-            'frequency' => $this->params->get('frequency', 'recurring'),
+            'frequency' => $this->frequency(),
         ])->render();
+    }
+
+    private function frequency(): string
+    {
+        $frequency = $this->params->get(
+            'frequency',
+            config('donation-checkout.default_frequency', 'recurring')
+        );
+
+        return in_array($frequency, ['single', 'recurring'], true) ? $frequency : 'recurring';
     }
 
     /**

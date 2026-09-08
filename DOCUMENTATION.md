@@ -26,6 +26,32 @@ STRIPE_PUBLISHABLE_KEY=
 Installing Donation Checkout will add a `donation-checkout.php` folder to your `config` folder. You will need to add
 `stripe_price_plan_id` and decide on the success urls for single and recurring donations.
 
+### Security Configuration
+
+The donation endpoint is public and unauthenticated by design, so two settings in
+`config/donation-checkout.php` control how much an anonymous visitor can do with it.
+
+```php
+'create_users' => true,
+
+'rate_limit_per_minute' => 5,
+'rate_limit_per_day' => 50,
+```
+
+**`create_users`** — when enabled (the default), a Statamic user is created for every new donor
+email so their Stripe customer can be reused on later donations. Because anyone can post to the
+endpoint, this means anonymous visitors can create user records for addresses they do not own.
+Those users are created without any role or group, so they gain no permissions, but if your site
+does not need donor accounts set this to `false`. Donors are then matched on their Stripe customer
+record instead and no Statamic users are written.
+
+**`rate_limit_per_minute` / `rate_limit_per_day`** — per-IP limits applied to
+`POST /donation-checkout/start`. The endpoint calls the Stripe API on every request, so keep these
+only as high as a genuine donor needs.
+
+The endpoint is also CSRF-protected. If you build your own form, send the site's CSRF token in the
+`X-CSRF-TOKEN` header (see the custom implementation examples below).
+
 ### Frontend Implementation
 
 There are two ways to implement the donation form in your Statamic site:

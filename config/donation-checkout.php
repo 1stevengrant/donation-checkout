@@ -18,4 +18,23 @@ return [
     // Form defaults (used by donation:scripts tag)
     'default_amount' => 10,
     'default_frequency' => 'recurring', // 'single' or 'recurring'
+
+    /*
+     * Create a Statamic user for every donor, keyed on their email address, so
+     * their Stripe customer can be reused on future donations.
+     *
+     * The donation endpoint is public, so leaving this enabled means anonymous
+     * visitors can create user records. Set it to false if your site does not
+     * need donor accounts; donors are then matched on their Stripe customer
+     * record instead and no Statamic users are written.
+     */
+    'create_users' => true,
+
+    /*
+     * Per-IP rate limits for POST /donation-checkout/start. This endpoint calls
+     * the Stripe API and (when enabled above) writes user records, so keep the
+     * limits only as high as a genuine donor needs.
+     */
+    'rate_limit_per_minute' => 5,
+    'rate_limit_per_day' => 50,
 ];

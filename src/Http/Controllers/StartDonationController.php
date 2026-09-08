@@ -3,6 +3,8 @@
 namespace Ghijk\DonationCheckout\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Stripe\Exception\ApiErrorException;
 use Statamic\Http\Controllers\Controller;
 use Ghijk\DonationCheckout\Services\UserService;
 use Ghijk\DonationCheckout\Actions\CreateSingleDonation;
@@ -21,41 +23,60 @@ class StartDonationController extends Controller
     ): JsonResponse {
         $validated = $donationRequest->validated();
 
-        $user = $userService->findByEmail($validated['email']);
+        $user = null;
+        $stripeCustomerId = null;
 
-        if (! $user) {
-            $user = $userService->createUser(
-                firstName: $validated['first_name'],
-                lastName: $validated['last_name'],
-                email: $validated['email']
-            );
+        if (config('donation-checkout.create_users', true)) {
+            $user = $userService->findByEmail($validated['email']);
+
+            if (! $user) {
+                $user = $userService->createUser(
+                    firstName: $validated['first_name'],
+                    lastName: $validated['last_name'],
+                    email: $validated['email']
+                );
+            }
+
+            $stripeCustomerId = $user->stripe_customer_id;
         }
 
-        $stripeCustomerId = $user->stripe_customer_id;
+        try {
+            if (! $stripeCustomerId) {
+                $customer = $createStripeCustomer(
+                    email: $validated['email'],
+                    name: "{$validated['first_name']} {$validated['last_name']}"
+                );
 
-        if (! $stripeCustomerId) {
-            $customer = $createStripeCustomer(
-                email: $validated['email'],
-                name: "{$validated['first_name']} {$validated['last_name']}"
-            );
+                $stripeCustomerId = $customer->id;
 
-            $stripeCustomerId = $customer->id;
+                if ($user) {
+                    $userService->updateUser($user, [
+                        'stripe_customer_id' => $stripeCustomerId,
+                    ]);
+                }
+            }
 
-            $userService->updateUser($user, [
-                'stripe_customer_id' => $stripeCustomerId,
+            $session = match ($validated['frequency']) {
+                'single' => $createSingleDonation(
+                    stripeCustomerId: $stripeCustomerId,
+                    amount: $validated['amount']
+                ),
+                'recurring' => $createRecurringDonation(
+                    stripeCustomerId: $stripeCustomerId,
+                    amount: $validated['amount']
+                ),
+            };
+        } catch (ApiErrorException $exception) {
+            Log::error('Donation checkout session could not be created.', [
+                'frequency' => $validated['frequency'],
+                'stripe_error' => $exception->getMessage(),
+                'stripe_request_id' => $exception->getRequestId(),
             ]);
-        }
 
-        $session = match ($validated['frequency']) {
-            'single' => $createSingleDonation(
-                stripeCustomerId: $stripeCustomerId,
-                amount: $validated['amount']
-            ),
-            'recurring' => $createRecurringDonation(
-                stripeCustomerId: $stripeCustomerId,
-                amount: $validated['amount']
-            ),
-        };
+            return response()->json([
+                'message' => 'We could not start your donation right now. Please try again shortly.',
+            ], 502);
+        }
 
         return response()->json([
             'url' => $session->url,
