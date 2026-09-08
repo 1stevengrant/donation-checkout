@@ -2,6 +2,18 @@
 
 All notable changes to `donation-checkout` will be documented in this file.
 
+## v2.1.6 (2026-09-08)
+
+Updates Statamic from 6.23.0 to 6.31.0 and CommonMark from 2.8.2 to 2.10.1 to address the reported security advisories and subsequent CommonMark fixes.
+
+Addon installations now require Statamic 6.31 or later within version 6, and CommonMark 2.10.1 or later.
+
+Validated with 34 passing tests (95 assertions) and a clean Composer audit.
+
+The separate Statamic advisory [GHSA-jppw-r5j3-xf7x](https://github.com/advisories/GHSA-jppw-r5j3-xf7x) has no identified upstream patched version and is not claimed as resolved by this release.
+
+Changes: https://github.com/1stevengrant/donation-checkout/pull/25
+
 ## v2.1.5 - 2026-08-04
 
 ### Fixed
